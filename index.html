@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" class="ui-mobile">
+    <head>
+    	<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+		<title>HiveCapture :: Screen Capture Tool</title>
+		<link rel="stylesheet" href="./css/hiveCapture.min.css" />
+		<link rel="stylesheet" href="./css/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="./css/jquery.mobile.css" />
+        <script src="./js/sc.common.js"></script>
+        <script src="./js/jquery.mobile.js"></script>
+        <script src="./js/sc.js"></script>
+        <style>
+            body {min-height:300px;}
+            .dimmed{position:fixed;left:0;top:0;right:0;bottom:0;opacity:0.7;background-color:#fff;}
+            .loading-box{position:fixed;left:0;top:0;right:0;bottom:0;width:120px;height:120px;margin:auto;background:url(./img/loading.gif) no-repeat;}
+        </style>
+    </head>
+    <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
+    	<div data-role="page" data-theme="a">
+    		<div data-role="header" data-position="inline">
+    			<button type="button" class="ui-btn ui-icon-carat-l ui-btn-icon-notext ui-corner-all ele-stage-2" style="display: none;">backward</button>
+				<h1>HiveCapture Screen Capture Tool</h1>
+			</div>
+			<div data-role="content" data-theme="a">
+				<div class="ui-grid-solo ele-stage-1">
+					<div class="ui-block-a"><button type="button" id="csvDnldBtn" class="ui-btn ui-shadow ui-corner-all">CSV 템플릿 다운로드</button></div>
+				</div>
+				<div class="ui-grid-solo ele-stage-1">
+					<div class="ui-block-a"><button type="button" id="csvInsrtBtn" class="ui-btn ui-shadow ui-corner-all">CSV 첨부</button>
+					</div>
+				</div>
+				<div class="ui-grid-solo ele-stage-2" style="display: none;">
+					<div class="ui-block-a"><button type="button" class="btn_capture" class="ui-btn ui-shadow ui-corner-all">일괄 캡처</button>
+					</div>
+				</div>
+
+				<table data-role="table" class="csv_table ele-stage-2" style="display: none;">
+					<colgroup>
+						<col style="width: 90%"/>
+						<col style="width: 10%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<th scope="col">URL</th><th scope="col"></th>
+						</tr>
+					</thead>
+					<tbody class="csvList"></tbody>
+				</table>
+			</div>
+			<div class="dimmed" style="display: none;"></div>
+			<input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
+    	</div>
+		
+    </body>
+</html>

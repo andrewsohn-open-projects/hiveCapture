@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "HiveCapture 일괄 스크린 캡처툴",
+    "description": "Hivelab :: CSV File Screen Capture Tool",
+    "version": "1.3.3",
+    "content_scripts": [
+        {
+          "matches": [
+            "<all_urls>"
+          ],
+          "js": ["./js/sc.common.js", "./js/sc.js"]
+        }
+    ],
+    "browser_action": {
+        "default_icon": "./img/icon.png",
+        "default_popup": "index.html"
+    },
+    "permissions": [
+        "tabs",
+        "downloads",
+        "storage",
+        "<all_urls>",
+        "http://qa.hivelab.co.kr:4000/samsung/*"
+    ]
+}
