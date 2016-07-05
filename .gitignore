@@ -1,0 +1,5 @@
+/api/vendor
+/api/application/libraries/vendor
+/api/assets/node_modules
+/api/data/*
+/api/public/storage

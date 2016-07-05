@@ -1,0 +1,16 @@
+<script type="text/template" id="_grid">
+<% _.each( list, function( item ){ %>
+    <li>
+        <% if ( item.image.url ){ %>
+        	<a href="#">
+        		<img src="<%- item.image.url %>" alt="<%- item.alt %>">
+		        <% if ( item.type === 'video' ){ %>
+		        	<span class="grid_icon_video">영상재생 아이콘</span>
+		        <% }%>
+        	</a>
+        <% } else { %>        	
+            <span>이미지 없음</span>
+        <% } %>
+    </li>
+<% }); %>
+</script>

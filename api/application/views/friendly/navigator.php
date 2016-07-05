@@ -1,0 +1,1 @@
+<div class="loc"><a href="<?= site_url(); ?>" class="loc_link"><span class="sp">home</span></a><?= (isset($depth2))? $depth2 : '' ?><?= (isset($depth3))? $depth3 : '' ?></div>
