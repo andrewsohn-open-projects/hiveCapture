@@ -1,4 +1,5 @@
 /api/.htaccess
+/chrome-extensions/csvScreenCapture.zip
 /api/vendor
 /api/application/libraries/vendor
 /api/assets/node_modules
