@@ -1,3 +1,4 @@
+/api/.htaccess
 /api/vendor
 /api/application/libraries/vendor
 /api/assets/node_modules

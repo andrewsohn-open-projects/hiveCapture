@@ -112,7 +112,8 @@ class ScAction extends HI_Controller {
 			$order = intval($_REQUEST['order'])+1;
 		}
 		
-		$here = FCPATH;
+		$here = FCPATH . DIRECTORY_SEPARATOR;
+		echo $here;
 		$bin_files = $here . 'bin' . DIRECTORY_SEPARATOR;
 		$data_files = $here . 'data' . DIRECTORY_SEPARATOR;
 		
@@ -158,6 +159,8 @@ class ScAction extends HI_Controller {
 // 		$img_name = random_string('alnum', 16);
 		 
 		$disallowed = array('http://', 'https://');
+		$domain_name = '';
+
 		foreach($disallowed as $d) {
 			if(strpos($v, $d) === 0) {
 				 $domain_name = str_replace($d, '', $v);
@@ -167,17 +170,16 @@ class ScAction extends HI_Controller {
 		$domain_name = str_replace('/', '_', $domain_name);
 		$img_name = $prefix . '_' . $order . '_' . $domain_name;
 		
-// 		$screen_file = $data_files .$folder_name. DIRECTORY_SEPARATOR . $img_name  . '_' . $w . '_' . $h . '.jpg';
 		$screen_file = $data_files .$folder_name. DIRECTORY_SEPARATOR . $img_name  . '.jpg';
 		$img_url .= $img_name . '.jpg';
-// 		echo '{"screen_file":"'.$screen_file .'", "img_url" : "'.$img_url.'"}';
-		$client = Client::getInstance();
-		$client->getEngine()->setPath($bin_files.'phantomjs');
-		$request = $client->getMessageFactory()->createCaptureRequest($v, 'GET');
-		$request->setViewportSize($w, $h);
-		$request->setOutputFile($screen_file);
-		$response = $client->getMessageFactory()->createResponse();
-		$client->send($request, $response);
+
+		// $client = Client::getInstance();
+		// $client->getEngine()->setPath($bin_files.'phantomjs');
+		// $request = $client->getMessageFactory()->createCaptureRequest($v, 'GET');
+		// $request->setViewportSize($w, $h);
+		// $request->setOutputFile($screen_file);
+		// $response = $client->getMessageFactory()->createResponse();
+		// $client->send($request, $response);
 		
 // 		$this->ajax->output_csrf(array('data' => array( 'url' => $img_url, 'status' => true)));
 		echo '{"data":{"url":"'.$img_url.'","status":true}}';

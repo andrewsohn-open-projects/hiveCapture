@@ -1,6 +1,22 @@
+/**
+ * This file is part of the hiveCapture.
+ * Requires jQuery 1.12.0
+ *
+ * https://github.com/andrewsohn/hiveCapture
+ * 
+ * Copyright 2016, Andrew Sohn
+ * hivelab Co., Ltd
+ * http://www.hivelab.co.kr/
+ * 
+ * Licensed under MIT
+ * 
+ * Released on: February 24, 2016
+ */
 ;
 (function($, window, document, undefined) {
-    'use strict';    
+    'use strict';
+
+    var _config = sc.ui.config;
 
     window.sc.ui.Extract = (function() {
         return {
@@ -28,11 +44,11 @@
                         stage2: '.ele-stage-2'
                     },
                     destUrl: './result.html', 
-                    getCapturedImg: 'http://qa.hivelab.co.kr:4000/samsung/scAction/chromeEx',
-                    getUuid: 'http://qa.hivelab.co.kr:4000/samsung/scAction/getUuid',
-                    csvTemplateUrl: 'http://qa.hivelab.co.kr:4000/samsung/assets/data/HC_URL_List_Template.csv',
+                    getCapturedImg: _config.api_url + '/scAction/chromeEx',
+                    getUuid: _config.api_url + '/scAction/getUuid',
+                    csvTemplateUrl: _config.api_url + '/assets/data/HC_URL_List_Template.csv',
                     actionUrl: './extract.html',
-                    defaultPrefix: 'HC'
+                    defaultPrefix: _config.file_prefix
                 };
 
                 this._options = $.extend(true, this._defaults, options);

@@ -4,5 +4,5 @@
         RewriteCond $1 !^(index\.php|images|assets|captcha|data|include|uploads|robots\.txt)
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^(.*)$ /samsung/index.php/$1 [L]
+        RewriteRule ^(.*)$ /hiveCapture/api/index.php/$1 [L]
 </IfModule>

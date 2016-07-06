@@ -11,7 +11,12 @@ Requires
 
 Change Log
 =====
- * `v 1.3.3`
+ * `v 1.3.5`
+	 * [new feature] footer logo inserted
+	 * [improved] lincese modified
+	 
+
+ * `v 1.3.3 & 1.3.4`
 	 * [new feature] prefix filename insertion
 	 * [improved] image filename ordered and specified as its URL
 	 
