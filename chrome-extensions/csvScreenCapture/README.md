@@ -7,12 +7,17 @@ Requires
 ------------------
  * `jQuery 1.12.0`
  * `Swiper 3.3.1`
+ * `bootstrap-datetimepicker.js`
 
 
 Change Log
 =====
+ * `v 1.3.6`
+	 * [new feature] capture scheduling 
+	 
+
  * `v 1.3.5`
-	 * [new feature] footer logo inserted
+	 * [improved] footer logo inserted
 	 * [improved] lincese modified
 	 
 

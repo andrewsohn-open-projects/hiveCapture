@@ -12,6 +12,11 @@
  * 
  * Released on: February 24, 2016
  */
+
+ /**
+ * Brazilian translation for bootstrap-datetimepicker
+ * Cauan Cabral <cauan@radig.com.br>
+ */
 ;
 (function($, window, document, undefined) {
     'use strict';    
@@ -19,10 +24,21 @@
     var _util = sc.ui.Util
     , _config = sc.ui.config;
 
+    /*******************
+     * Languages
+     *******************
+     */    
+    $.fn.datetimepicker.dates['kr'] = {
+            days: ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"],
+            daysShort: ["일", "월", "화", "수", "목", "금", "토", "일"],
+            daysMin: ["일", "월", "화", "수", "목", "금", "토", "일"],
+            months: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+            monthsShort: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+    };
+
     sc.ui.Entry = (function() {
         return {
             init: function(container, options) {
-                console.log(_config);
                 this._defaults = {
                     csvEle: {
                         btn: '#csvInsrtBtn',
@@ -39,6 +55,12 @@
                     },
                     dimmed: {
                         cont: '.dimmed'
+                    },
+                    datepicker: {
+                        ele: '#datetimepicker',
+                        inpt: 'input[type=text]',
+                        dpBtn: '.add-on',
+                        timerBtn: '#isTimer'
                     },
                     stage: {
                         stage1: '.ele-stage-1',
@@ -62,6 +84,7 @@
 
             _initProperties: function() {
                 this.xhr = [];
+                this.isTimer = false;
             },
 
             _assignedHTMLElements: function() {
@@ -80,30 +103,43 @@
 
                 this.dimmed = this.container.find(this._options.dimmed.cont);
                 this.urls = this.container.find(this._options.submit.urls);
+                // console.log(this.urls)
                 this.submitBtn = this.container.find(this._options.submit.btn);
+
+                //datepicker
+                this.dp = this.container.find(this._options.datepicker.ele);
+                this.dpInpt = this.dp.find(this._options.datepicker.inpt);
+                this.dpBtn = this.dp.find(this._options.datepicker.dpBtn);
+
+                //timer button
+                this.timerBtn = this.container.find(this._options.datepicker.timerBtn);
             },
 
             _attachEvents: function() {
                 this.btn.on('click', $.proxy(this._onClickBtn, this));
                 this.downTempBtn.on('click', $.proxy(this._onClickTempBtn, this));
                 this.fileEle.on('change', $.proxy(this._onFileChange, this));
-                this.list.on('click', $.proxy(this._onListClick, this));
-                this.submitBtn.on('click', $.proxy(this._onSubmit, this));
-                this.backBtn.on('click', $.proxy(this._goToFirst, this));
+                this.timerBtn.on('change', $.proxy(this.timerChange, this));
+
+                var prevDate = new Date();
+                prevDate.setDate(prevDate.getDate()-1);
+
+                this.dp.datetimepicker({
+                    format: 'dd/MM/yyyy hh:mm:ss',
+                    language: 'kr',
+                    startDate: prevDate
+                }).on('changeDate', $.proxy(this.datePickerChange, this));
             },
 
-            _goToFirst: function(e){
-                e.preventDefault();
-                this.fileEle.val('');
-                this.list.empty();
-                this.eleStage1.show();
-                this.eleStage2.hide();
+            datePickerChange: function(e){
+                this.timerDate = e.localDate;
+                // console.log(e.currentTarget);
+                // $(e.currentTarget).datetimepicker('hide');
             },
 
             _onClickTempBtn: function(e){
                 e.preventDefault();
                 var _this = this;
-                // this.idown.attr('src', downUrl);
                 chrome.downloads.download({url: _this._options.csvTemplateUrl});
             },
 
@@ -163,6 +199,12 @@
                         var url = _this._options.actionUrl;
 
                         localStorage['csvUrl'] = _this.csvval.join();
+                        localStorage['isTimer'] = 0;
+                        // 타이머 모드 설정
+                        if(_this.isTimer){
+                            localStorage['isTimer'] = 1;
+                            if('undefined' !== typeof _this.timerDate) localStorage['timerDate'] = _this.timerDate;
+                        }
                         
                         chrome.windows.create({
                             'url': url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
@@ -176,111 +218,31 @@
                 return false;
             },
 
-            // _getRandomToken: function() {
-            //     // E.g. 8 * 32 = 256 bits token
-            //     var randomPool = new Uint8Array(32);
-            //     crypto.getRandomValues(randomPool);
-            //     var hex = '';
-            //     for (var i = 0; i < randomPool.length; ++i) {
-            //         hex += randomPool[i].toString(16);
-            //     }
-            //     // E.g. db18458e2782b2b77e36769c569e263a53885a9944dd0a861e5064eac16f1a
-            //     return hex;
-            // },
-
             _onClickBtn: function(e) {
                 e.preventDefault();
                 var target = $(e.currentTarget);
                 this.fileEle.trigger('click');
             },
 
-            _onListClick: function(e) {
-                var trg = $(e.target);
-                if(trg.hasClass('removeBtn')){
-                    var tr = trg.parents('tr').eq(0),
-                    removeBtns = this.list.find('.removeBtn'), 
-                    idx = removeBtns.index(trg);
+            timerChange: function(e) {
+                if(e.target.checked){
+                    //체크 true
+                    //enable input 
+                    this.dpInpt.prop('disabled', false);
 
-	                this.csvval.splice(idx, 1);
-	                this.urls.val(this.csvval.join());
-	                tr.remove();
+                    //enable button
+                    this.dpBtn.show();
+                    this.isTimer = true;
+                }else{
+                    //체크 false
+                    //disable input 
+                    this.dpInpt.prop('disabled', true);
+                    if(this.dpInpt.val().length) this.dpInpt.val('');
 
-                } else if(trg.hasClass('alink')){
-                	chrome.windows.create({"url": trg.attr('href'), "type": "popup"});
+                    //disable button
+                    this.dpBtn.hide();
+                    this.isTimer = false;
                 }
-
-                
-            },
-
-            _onSubmit: function(e) {
-            	e.preventDefault;
-                var _this = this;
-
-            	_this.stNum = 0;
-            	
-//            	this.imageCont.show();
-				_this._getUuid(function(){
-                    _this.dimmed.show();
-                    _this.container.append('<div class="loading-box" style="display : block;"></div>');
-                    if('undefined' != typeof _this.uuid) _this._loopSCAjax(_this.stNum);
-                });
-            	
-            },
-
-            _getUuid: function(cb){
-            	var fullUrl = this._options.getUuid
-            	, xhr = new XMLHttpRequest()
-            	, _this = this;
-				xhr.open("GET", fullUrl, true);
-				xhr.setRequestHeader("Content-Type","application/json");
-				xhr.timeout = 10000;
-				xhr.onreadystatechange = function() {
-				    if (xhr.readyState == 4 && xhr.status == 200) {
-				    	var res = JSON.parse(xhr.responseText);
-				    	_this.uuid = res.data.uuid;
-                        cb();
-				  }
-				}
-	       		xhr.send();
-            },
-
-            _loopSCAjax: function(st) {
-            	if(this.csvval.length > st){
-            		console.log(this.uuid, this.csvval.length, st)
-            		var _this = this, 
-                    json = { url : _this.csvval[st] };
-
-					var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvval[st] + '&uuid=' + _this.uuid;
-					_this.xhr[st] = new XMLHttpRequest();
-					_this.xhr[st].open("GET", fullUrl, true);
-					_this.xhr[st].setRequestHeader('Content-Type', 'application/json');
-					_this.xhr[st].timeout = 10000;
-					_this.xhr[st].onreadystatechange = function() {
-                        if (_this.xhr[st].readyState == 4 && _this.xhr[st].status == 200) {
-					    	var res = JSON.parse(_this.xhr[st].responseText);
-					       //handle the xhr response here
-					       // if () {
-					       		setTimeout(function(){
-                                    _this.list.find('tr').eq(st).addClass('sc-success');
-                                    _this.stNum ++;
-                                    _this._loopSCAjax(_this.stNum);
-					       		}, 1000);
-					       		
-					       // }
-					       
-					  }else{
-                        _this.list.find('tr').eq(st).addClass('sc-fail');
-                      }
-					}
-					setTimeout(function(){
-		       			_this.xhr[st].send();
-		       		}, 1000);
-					
-				}else if(this.csvval.length === st){
-                    var url = this._options.destUrl + '?uuid=' + this.uuid;
-                    this.dimmed.empty();
-					chrome.tabs.create({"url": url});
-				}
             }
         };
     })();

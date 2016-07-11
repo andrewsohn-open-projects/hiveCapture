@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
     "name": "HiveCapture 일괄 스크린 캡처툴",
-    "description": "Hivelab :: CSV File Screen Capture Tool",
-    "version": "1.3.5",
+    "description": "HiveCapture :: CSV File Screen Capture Tool",
+    "version": "1.3.6",
     "content_scripts": [
         {
           "matches": [

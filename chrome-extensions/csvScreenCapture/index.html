@@ -5,24 +5,39 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
 		<title>HiveCapture :: Screen Capture Tool</title>
 		<link rel="stylesheet" href="./css/hiveCapture.min.css" />
-		<link rel="stylesheet" href="./css/jquery.mobile.icons.min.css" />
-		<link rel="stylesheet" href="./css/jquery.mobile.css" />
+		<link href="./css/bootstrap-combined.min.css" rel="stylesheet">
+    	<link rel="stylesheet" type="text/css" media="screen" href="./css/bootstrap-datetimepicker.min.css">
         <script src="./js/sc.common.js"></script>
-        <script src="./js/jquery.mobile.js"></script>
+        <script src="./js/sc.datepicker.js"></script>
         <script src="./js/sc.js"></script>
         <style>
-            body {min-height:300px;}
+            body {min-height:350px;min-width:300px;}
             .dimmed{position:fixed;left:0;top:0;right:0;bottom:0;opacity:0.7;background-color:#fff;}
             .loading-box{position:fixed;left:0;top:0;right:0;bottom:0;width:120px;height:120px;margin:auto;background:url(./img/loading.gif) no-repeat;}
+            .ui-header h1{margin:0;padding:0;font-size:1em;display:inline-block}
+            .ui-checkbx { display: inline; }
+            .ui-checkbx label{ display: inline; }
+            #datetimepicker {display: inline;}
         </style>
     </head>
     <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
     	<div data-role="page" data-theme="a">
-    		<div data-role="header" data-position="inline">
-    			<button type="button" class="ui-btn ui-icon-carat-l ui-btn-icon-notext ui-corner-all ele-stage-2" style="display: none;">backward</button>
-				<h1>HiveCapture Screen Capture Tool</h1>
-			</div>
+    		<header class="ui-header" data-role="header" data-position="inline">
+    			<h1>HiveCapture Screen Capture Tool</h1>
+			</header>
 			<div data-role="content" data-theme="a">
+				<div class="ui-checkbx">
+					<input type="checkbox" name="isTimer" id="isTimer" value="Bike">
+					<label for="isTimer">Timer</label>
+				</div>
+
+				<div id="datetimepicker" class="input-append date" style="text-align:right;">
+			      <input type="text" style="width:200px;" disabled/>
+			      <span class="add-on" style="display:none;">
+			        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+			      </span>
+			    </div>
+
 				<div class="ui-grid-solo ele-stage-1">
 					<div class="ui-block-a"><button type="button" id="csvDnldBtn" class="ui-btn ui-shadow ui-corner-all">CSV 템플릿 다운로드</button></div>
 				</div>
@@ -35,25 +50,15 @@
 					</div>
 				</div>
 
-				<table data-role="table" class="csv_table ele-stage-2" style="display: none;">
-					<colgroup>
-						<col style="width: 90%"/>
-						<col style="width: 10%"/>
-					</colgroup>
-					<thead>
-						<tr>
-							<th scope="col">URL</th><th scope="col"></th>
-						</tr>
-					</thead>
-					<tbody class="csvList"></tbody>
-				</table>
-
-				<footer>
-					<div class="logo"><img src="img/logo-hivelab.png" alt="hivelab"></div>
-				</footer>
+				
 			</div>
+
 			<div class="dimmed" style="display: none;"></div>
 			<input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
+
+			<footer>
+				<div class="logo"><img src="img/logo-hivelab.png" alt="hivelab"></div>
+			</footer>
     	</div>
 		<!-- 
 		* This file is part of the hiveCapture.
