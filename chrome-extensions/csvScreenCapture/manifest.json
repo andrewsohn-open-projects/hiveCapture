@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "HiveCapture 일괄 스크린 캡처툴",
     "description": "HiveCapture :: CSV File Screen Capture Tool",
-    "version": "1.3.6",
+    "version": "1.4.1",
     "content_scripts": [
         {
           "matches": [

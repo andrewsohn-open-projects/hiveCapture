@@ -12,7 +12,11 @@ Requires
 
 Change Log
 =====
- * `v 1.3.6`
+ * `v 1.4.1`
+	 * [bug fix] infinite loading process when capturing 
+
+
+ * `v 1.4.0`
 	 * [new feature] capture scheduling 
 	 
 
