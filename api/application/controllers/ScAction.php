@@ -172,22 +172,24 @@ class ScAction extends HI_Controller {
 		$img_url .= $img_name . '.jpg';
 // 		echo '{"screen_file":"'.$screen_file .'", "img_url" : "'.$img_url.'"}';
 		$client = Client::getInstance();
-$client->isLazy();
-$client->getEngine()->setPath($bin_files.'phantomjs');
-$request  = $client->getMessageFactory()->createCaptureRequest();
-$response = $client->getMessageFactory()->createResponse();
 
-$request->setMethod('GET');
-$request->setUrl($v);
-$request->setTimeout(8000);
-//		$client->getEngine()->setPath($bin_files.'phantomjs');
-//		$client->getEngine()->addOption('--load-images=true');
-//		$client->getEngine()->addOption('--ignore-ssl-errors=true');
-//		$request = $client->getMessageFactory()->createCaptureRequest($v, 'GET');
-		$request->setViewportSize($w, $h);
-		$request->setOutputFile($screen_file);
-//		$response = $client->getMessageFactory()->createResponse();
-		$client->send($request, $response);
+        $client->getEngine()->setPath($bin_files.'phantomjs');
+        $request = $client->getMessageFactory()->createCaptureRequest($v, 'GET');
+        $request->setViewportSize($w, $h);
+        $request->setOutputFile($screen_file);
+        $response = $client->getMessageFactory()->createResponse();
+
+//$client->isLazy();
+//$client->getEngine()->setPath($bin_files.'phantomjs');
+//$request  = $client->getMessageFactory()->createCaptureRequest();
+//$response = $client->getMessageFactory()->createResponse();
+
+//$request->setMethod('GET');
+//$request->setUrl($v);
+//$request->setTimeout(8000);
+
+
+        $client->send($request, $response);
 		
 // 		$this->ajax->output_csrf(array('data' => array( 'url' => $img_url, 'status' => true)));
 		echo '{"data":{"url":"'.$img_url.'","status":true}}';

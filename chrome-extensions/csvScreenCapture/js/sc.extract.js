@@ -306,7 +306,7 @@
 
             _loopSCAjax: function(st) {
                 if(this.csvUrl.length > st){
-                    // console.log(this.uuid, this.csvUrl.length, st)
+                    console.log(this.uuid, this.csvUrl.length, st)
                     var _this = this;
 
                     var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st;
@@ -314,7 +314,7 @@
                     _this.xhr[st] = new XMLHttpRequest();
                     _this.xhr[st].open('GET', fullUrl, true);
                     _this.xhr[st].setRequestHeader('Content-Type', 'application/json');
-                    _this.xhr[st].timeout = 10000;
+                    _this.xhr[st].timeout = 30000;
                     _this.xhr[st].onreadystatechange = function() {
                         if (_this.xhr[st].readyState === 4 && _this.xhr[st].status === 200) {
                             var res = JSON.parse(_this.xhr[st].responseText);
