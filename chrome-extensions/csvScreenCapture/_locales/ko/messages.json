@@ -1,0 +1,6 @@
+{
+	"name": "HiveCapture 일괄 스크린 캡처툴",
+    "description": "HiveCapture :: CSV File Screen Capture Tool",
+    "timeout": "$nth$ 번째 URL를 캡처하는 도중에 Timeout error가 발생하였습니다.\n다시 시도하여 주십시요.",
+    "zipConfirm": "Zip 파일 다운로드와 동시에 해당 파일을 서버에서 보관하지 않습니다.\n진행하시겠습니까?"
+}

@@ -1,0 +1,6 @@
+{
+	"name": "HiveCapture",
+    "description": "HiveCapture :: CSV File Screen Capture Tool",
+    "timeout": "A timeout error occurs when capturing $nth$ th URL.\nPlease try again.",
+    "zipConfirm": "As you proceed zip file download, the file from the server will be removed.\nWould you like to proceed?"
+}

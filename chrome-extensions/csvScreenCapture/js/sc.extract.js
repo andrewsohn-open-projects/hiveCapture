@@ -318,19 +318,22 @@
                     _this.xhr[st].onreadystatechange = function() {
                         if (_this.xhr[st].readyState === 4 && _this.xhr[st].status === 200) {
                             var res = JSON.parse(_this.xhr[st].responseText);
-                           //handle the xhr response here
-                           // if () {
-                                setTimeout(function(){
-                                    _this.list.find('tr').eq(st).addClass('sc-success');
-                                    _this.stNum ++;
-                                    _this._loopSCAjax(_this.stNum);
-                                }, 1000);
-                                
-                           // }
-                           
-                      }else{
-                        _this.list.find('tr').eq(st).addClass('sc-fail');
-                      }
+                            
+                            setTimeout(function(){
+                                _this.list.find('tr').eq(st).addClass('sc-success');
+                                _this.stNum ++;
+                                _this._loopSCAjax(_this.stNum);
+                            }, 1000);
+                        }else{
+                            _this.list.find('tr').eq(st).addClass('sc-fail');
+                        }
+                    };
+
+                    xhr.ontimeout = function (e) {
+                        var nth = st+1;
+                        alert(chrome.i18n.getMessage('timeout', [nth]));
+                        window.close();
+                        return false;
                     };
 
                     setTimeout(function(){

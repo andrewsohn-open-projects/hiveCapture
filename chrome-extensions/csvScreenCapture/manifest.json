@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
-    "name": "HiveCapture 일괄 스크린 캡처툴",
-    "description": "HiveCapture :: CSV File Screen Capture Tool",
+    "name": "__MSG_name__",
+    "description": "__MSG_description__",
     "version": "1.4.1",
     "content_scripts": [
         {
@@ -11,6 +11,7 @@
           "js": ["./js/sc.common.js", "./js/sc.js"]
         }
     ],
+    "default_locale":"en",
     "browser_action": {
         "default_icon": "./img/icon.png",
         "default_popup": "index.html"

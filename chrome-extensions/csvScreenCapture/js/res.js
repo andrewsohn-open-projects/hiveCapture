@@ -33,12 +33,6 @@
                         zipDownBtn: '.btn_zip', 
                         imgDownBtn: '.btn_each'
                     },
-                    message: {
-                        zipConfirm: {
-                            ko: 'Zip 파일 다운로드와 동시에 해당 파일을 서버에서 보관하지 않습니다.\n진행하시겠습니까?', 
-                            en: 'As you proceed zip file download, the file from the server will be removed'
-                        }
-                    },
                     getImageList: _config.api_url + '/scAction/getImageList',
                     getDownloadImg: _config.api_url + '/scAction/getDownloadImg',
                     getDownloadZip: _config.api_url + '/scAction/procZip',
@@ -143,7 +137,7 @@
                 var ct = $(e.currentTarget),
                 _this = this;
 
-                if(!confirm(_this._options.message.zipConfirm.ko)) return;
+                if(!confirm(chrome.i18n.getMessage('zipConfirm'))) return;
 
                 var fullUrl = this._options.getDownloadZip + '?uuid=' + this.uuid,
                 xhr = new XMLHttpRequest();
