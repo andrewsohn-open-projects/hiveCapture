@@ -33,10 +33,10 @@
                         zipDownBtn: '.btn_zip', 
                         imgDownBtn: '.btn_each'
                     },
-                    getImageList: _config.api_url + '/scAction/getImageList',
-                    getDownloadImg: _config.api_url + '/scAction/getDownloadImg',
-                    getDownloadZip: _config.api_url + '/scAction/procZip',
-                    getCleaned: _config.api_url + '/scAction/deleteAll'
+                    getImageList: _config.api_url + '/api/images',
+                    getDownloadImg: _config.api_url + '/download/image',
+                    getZip: _config.api_url + '/api/proczip',
+                    getCleaned: _config.api_url + '/download/delete'
                 };
 
                 this._options = $.extend(true, this._defaults, options);
@@ -65,9 +65,10 @@
                 var _this = this;
 
                 this._getImgData(function(data){
-                    $.each(data.imgList, function(){
-                        var li = '<li class="swiper-slide" data-no="' + this.no + 
-                            '" data-img="' + this.name + '"><img src="' + this.url + '" alt=""></li>';
+                    $.each(data.imgList, function(i, v){
+                        var url = _config.api_url + '/upload/' + _this.uuid + '/' + v;
+                        var li = '<li class="swiper-slide" data-no="' + i + 
+                            '" data-img="' + v + '"><img src="' + url + '" alt=""></li>';
                         _this.swiper.appendSlide(li);
                     });
 
@@ -84,8 +85,8 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        _this.imgList = res.data.imgList;
-                        cb(res.data);
+                        _this.imgList = res.imgList;
+                        cb(res);
                     }
                 };
                 xhr.send();
@@ -139,7 +140,7 @@
 
                 if(!confirm(chrome.i18n.getMessage('zipConfirm'))) return;
 
-                var fullUrl = this._options.getDownloadZip + '?uuid=' + this.uuid,
+                var fullUrl = this._options.getZip + '?uuid=' + this.uuid,
                 xhr = new XMLHttpRequest();
                 xhr.open('GET', fullUrl, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
@@ -147,13 +148,20 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        if(!res.data.status) return;
+                        if(!res.status) return;
 
                         // var downUrl = res.data.zipUrl + '?uuid=' + _this.uuid;
                         // _this.idown.attr('src', downUrl);
-                        var downUrl = res.data.zipUrl;
+                        var downUrl = _config.api_url + '/download/zip?uuid=' + _this.uuid;
                         
-                        chrome.downloads.download({url: downUrl}, function(id) {
+                        // chrome.downloads.download({url: downUrl}, function(id) {
+                            // _this._cleanUpServerFiles();
+                            // ct.attr('disabled',true);
+                            // _this.imgDownBtn.attr('disabled',true);
+                        // });
+                        chrome.tabs.update({
+                            url: downUrl
+                        },function(tab){
                             _this._cleanUpServerFiles();
                             ct.attr('disabled',true);
                             _this.imgDownBtn.attr('disabled',true);
@@ -174,12 +182,15 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        if(!res.data.status) return;
+                        if(!res.status) return;
 
                         //창 닫기
                     }
                 };
-                xhr.send();
+
+                setTimeout(function(){
+                    xhr.send();
+                }, 1000);
             },
 
             _onClickImgBtn: function(e){
@@ -187,17 +198,17 @@
                 var _this = this, 
                     selImgName = $(this.swiper.slides.eq(this.swiper.activeIndex)[0]).data('img');
                 
-                $.each(this.imgList, function(){
-                    if(this.name === selImgName) _this._getDownloadImg(this);
+                $.each(this.imgList, function(i,v){
+                    if(v === selImgName){
+                        _this._getDownloadImg(this);
+                    }
                 });
             },
 
-            _getDownloadImg: function(imageObj){
+            _getDownloadImg: function(imageName){
                 var _this = this;
-                // var downUrl = this._options.getDownloadImg + '?uuid=' + this.uuid + '&img=' + imageObj.name;
-                // this.idown.attr('src', downUrl);
-
-                chrome.downloads.download({url: imageObj.url});
+                var url = _config.api_url + '/upload/' + _this.uuid + '/' + imageName;
+                chrome.downloads.download({url: url});
             }
         };
     })();

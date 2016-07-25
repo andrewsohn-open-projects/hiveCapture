@@ -1,6 +1,32 @@
 {
-	"name": "HiveCapture",
-    "description": "HiveCapture :: CSV File Screen Capture Tool",
-    "timeout": "A timeout error occurs when capturing $nth$ th URL.\nPlease try again.",
-    "zipConfirm": "As you proceed zip file download, the file from the server will be removed.\nWould you like to proceed?"
+	"name": {
+		"message":"HiveCapture"
+	},
+    "description": {
+		"message":"HiveCapture :: CSV File Screen Capture Tool"
+	},
+    "timeout": {
+    	"message":"A timeout error occurs when capturing $nth$ th URL.\nPlease try again.",
+    	"placeholders": {
+          "nth": {
+            "content": "$1",
+            "example": "unknown number"
+          }
+        }
+    },
+    "firstInvalid": {
+        "message":"Sorry, the first URL could not be found.\nPlease try again."
+    },
+    "erorrRedirect": {
+        "message":"Unfortunately, the process has been terminated due to 404 error occured capturing the $nth$ th URL.\nIt will proceed to result page.",
+        "placeholders": {
+          "nth": {
+            "content": "$1",
+            "example": "unknown number"
+          }
+        }
+    },
+    "zipConfirm": {
+    	"message":"As you proceed zip file download, the file from the server will be removed.\nWould you like to proceed?"
+    }
 }

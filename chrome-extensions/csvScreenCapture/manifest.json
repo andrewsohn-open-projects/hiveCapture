@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "__MSG_name__",
     "description": "__MSG_description__",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "content_scripts": [
         {
           "matches": [
@@ -21,6 +21,6 @@
         "downloads",
         "storage",
         "<all_urls>",
-        "http://qa.hivelab.co.kr:4000/samsung/*"
+        "http://qa.hivelab.co.kr:1337/*"
     ]
 }

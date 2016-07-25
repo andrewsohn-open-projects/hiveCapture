@@ -62,9 +62,9 @@
                         ele: '#timer'
                     },
                     destUrl: './result.html', 
-                    getCapturedImg: _config.api_url + '/scAction/chromeEx',
-                    getUuid: _config.api_url + '/scAction/getUuid',
-                    csvTemplateUrl: _config.api_url + '/assets/data/HC_URL_List_Template.csv',
+                    getCapturedImg: _config.api_url + '/api/capture',
+                    getUuid: _config.api_url + '/uuid',
+                    csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
                     actionUrl: './extract.html',
                     defaultPrefix: _config.file_prefix
                 };
@@ -133,8 +133,8 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        _this.imgList = res.data.imgList;
-                        cb(res.data);
+                        _this.imgList = res.imgList;
+                        cb(res);
                     }
                 };
                 xhr.send();
@@ -297,7 +297,7 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        _this.uuid = res.data.uuid;
+                        _this.uuid = res.uuid;
                         cb();
                   }
                 };
@@ -309,27 +309,44 @@
                     console.log(this.uuid, this.csvUrl.length, st)
                     var _this = this;
 
-                    var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st;
-                    // console.log(fullUrl)
+                    var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st + '&isSsPreview=true';
+                    console.log(fullUrl)
                     _this.xhr[st] = new XMLHttpRequest();
                     _this.xhr[st].open('GET', fullUrl, true);
                     _this.xhr[st].setRequestHeader('Content-Type', 'application/json');
                     _this.xhr[st].timeout = 30000;
                     _this.xhr[st].onreadystatechange = function() {
-                        if (_this.xhr[st].readyState === 4 && _this.xhr[st].status === 200) {
-                            var res = JSON.parse(_this.xhr[st].responseText);
+                        if (_this.xhr[st].readyState === 4 ) {
+                            if(_this.xhr[st].status === 200){
+                                var res = JSON.parse(_this.xhr[st].responseText);
                             
-                            setTimeout(function(){
-                                _this.list.find('tr').eq(st).addClass('sc-success');
-                                _this.stNum ++;
-                                _this._loopSCAjax(_this.stNum);
-                            }, 1000);
+                                setTimeout(function(){
+                                    _this.list.find('tr').eq(st).addClass('sc-success');
+                                    _this.stNum ++;
+                                    _this._loopSCAjax(_this.stNum);
+                                }, 1000);
+                            }else{
+                                if(_this.xhr[st].status === 404){
+                                    if(st === 0){
+                                        alert(chrome.i18n.getMessage('firstInvalid'));
+                                    }else{
+                                        var nth = st+1;
+                                        alert(chrome.i18n.getMessage('erorrRedirect', [nth]));
+                                        var url = this._options.destUrl + '?uuid=' + this.uuid;
+                                        this.dimmed.empty();
+                                        chrome.tabs.create({"url": url});
+                                    }
+                                    window.close();
+                                }
+                                _this.list.find('tr').eq(st).addClass('sc-fail');
+                            }
+                            
                         }else{
-                            _this.list.find('tr').eq(st).addClass('sc-fail');
+                            
                         }
                     };
 
-                    xhr.ontimeout = function (e) {
+                    _this.xhr[st].ontimeout = function (e) {
                         var nth = st+1;
                         alert(chrome.i18n.getMessage('timeout', [nth]));
                         window.close();

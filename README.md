@@ -12,7 +12,12 @@ Requires
 
 Change Log
 =====
-* `v 1.4.1`
+ * `v 1.4.2`
+	 * [improved] message.json created in order to support each locale of KO and EN
+	 * [improved] alerts that Site Capturing is expired and dismissed
+
+
+ * `v 1.4.1`
 	 * [bug fix] infinite loading process when capturing 
 
 

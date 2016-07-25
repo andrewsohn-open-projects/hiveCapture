@@ -55,10 +55,7 @@
                         stage2: '.ele-stage-2',
                         backBtn: '.ui-icon-carat-l'
                     },
-                    destUrl: './result.html', 
-                    getCapturedImg: _config.api_url + '/scAction/chromeEx',
-                    getUuid: _config.api_url + '/scAction/getUuid',
-                    csvTemplateUrl: _config.api_url + '/assets/data/HC_URL_List_Template.csv',
+                    csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
                     actionUrl: './extract.html'
                 };
 

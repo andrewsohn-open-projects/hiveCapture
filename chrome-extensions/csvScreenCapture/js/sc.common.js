@@ -13104,7 +13104,7 @@ sc.ui.config = {
         dots: true,
         arrows: false
     },
-    api_url: 'http://qa.hivelab.co.kr:4000/samsung/api',
+    api_url: 'http://qa.hivelab.co.kr:1337',
     file_prefix: 'HC'
 };
 

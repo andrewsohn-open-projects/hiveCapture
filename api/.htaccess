@@ -1,8 +1,0 @@
-<IfModule mod_rewrite.c>
-        RewriteEngine On
-        RewriteBase /
-        RewriteCond $1 !^(index\.php|images|assets|captcha|data|include|uploads|robots\.txt)
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^(.*)$ /hiveCapture/api/index.php/$1 [L]
-</IfModule>
