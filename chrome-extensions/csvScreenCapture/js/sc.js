@@ -48,13 +48,22 @@
                         ele: '#datetimepicker',
                         inpt: 'input[type=text]',
                         dpBtn: '.add-on',
-                        timerBtn: '#isTimer'
+                        timerBtn: 'input[name=isTimer]'
+                    },
+                    swiper: {
+                        cont: '.swiper-container',
+                        arrow: {
+                            prev: '.js-slide-prev',
+                            next: '.js-slide-next'
+                        }
                     },
                     stage: {
-                        stage1: '.ele-stage-1',
+                        stage1: '.js-stage-1',
+                        stage1Btns: '.btns a',
                         stage2: '.ele-stage-2',
                         backBtn: '.ui-icon-carat-l'
                     },
+                    isSamsung: "js-isSamsung",
                     csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
                     actionUrl: './extract.html'
                 };
@@ -64,10 +73,37 @@
                 this.container = container;
                 this._assignedHTMLElements();
                 this._initProperties();
+                this._sigletone();
                 this._attachEvents();
             },
 
+            _sigletone: function() {
+                var _this = this;
+
+                (function() {
+                    _this.swiperCont.swiper({
+                        mode: 'horizontal',
+                        watchActiveIndex: true,
+                        loop: false,
+                        allowSwipeToPrev:false,
+                        allowSwipeToNext:false,
+                        touchMoveStopPropagation:false,
+                        onSlideChangeStart:function(swiper){
+
+                        },
+                        slidesPerView: 1,
+                        onInit: function(swiper) {
+                            _this.swiper = swiper;
+                        }
+                    });
+                })();
+
+                return _this.swiper;
+            },
+
             _initProperties: function() {
+                this.mode = "default";
+                this.stageNum = 0;
                 this.xhr = [];
                 this.isTimer = false;
             },
@@ -80,8 +116,17 @@
                 this.table = this.container.find(this._options.csvEle.table);
                 this.list = this.table.find(this._options.csvEle.listCont);
 
-                this.eleStage1 = this.container.find(this._options.stage.stage1);
-                this.eleStage2 = this.container.find(this._options.stage.stage2);
+                // SWIPER
+                this.swiperCont = this.container.find(this._options.swiper.cont);
+                this.slidePrevBtn = this.swiperCont.find(this._options.swiper.arrow.prev);
+                this.slideNextBtn = this.swiperCont.find(this._options.swiper.arrow.next);
+                
+                // STAGE 1
+                this.stage1Cont = this.swiperCont.find(this._options.stage.stage1);
+                this.stage1Btns = this.stage1Cont.find(this._options.stage.stage1Btns);
+
+                // STAGE 2
+                // this.eleStage2 = this.container.find(this._options.stage.stage2);
                 this.backBtn = this.container.find(this._options.stage.backBtn);
                 // this.listTmpl = this.container.find(this._options.csvEle.tmpl);
                 // this.idown = $('<iframe>', { id: 'idown', src: '' }).hide().appendTo(this.container);
@@ -101,6 +146,7 @@
             },
 
             _attachEvents: function() {
+                this.stage1Btns.on('click', $.proxy(this._onClickSt1Btn, this));
                 this.btn.on('click', $.proxy(this._onClickBtn, this));
                 this.downTempBtn.on('click', $.proxy(this._onClickTempBtn, this));
                 this.fileEle.on('change', $.proxy(this._onFileChange, this));
@@ -114,6 +160,97 @@
                     language: 'kr',
                     startDate: prevDate
                 }).on('changeDate', $.proxy(this.datePickerChange, this));
+
+
+                //Slide Prev / Next buttons
+                this.slidePrevBtn.on('click', $.proxy(this._onClickPrevBtn, this));
+                this.slideNextBtn.on('click', $.proxy(this._onClickNextBtn, this));
+            },
+
+            _onClickPrevBtn: function(e){
+                e.preventDefault();
+                var trg = $(e.currentTarget);
+                var _this = this;
+
+                if(this.swiper.activeIndex === 2) _this.stageNum--;
+                
+                if(this._stageValidCheck('prev')) {
+                    this.swiper.params.allowSwipeToPrev = true;
+                    this.swiper.params.onSlideChangeEnd = function(swiper){
+                        _this.swiper.params.allowSwipeToPrev = false;
+                        _this.swiper.params.onSlideChangeEnd = null;
+                        _this.swiper.update();
+                        _this.stageNum--;
+                    }
+
+                    this.swiper.update();
+                    this.swiper.slidePrev();
+                }
+            },
+
+            _onClickNextBtn: function(e){
+                e.preventDefault();
+                var trg = $(e.currentTarget);
+                var _this = this;
+                
+                //STAGE2에서는 default로 '사용 안함'버튼 checked 
+                if(this.swiper.activeIndex === 1){
+                    if(this.timerBtn.filter(':checked').attr('id') === 'timer'){
+                        if(this.dpInpt.val().length > 0) _this.stageNum++;
+                    }else{
+                        _this.stageNum++;
+                    }
+                }
+
+                if(this._stageValidCheck('next')) {
+                    this.swiper.params.allowSwipeToNext = true;
+                    this.swiper.params.onSlideChangeEnd = function(swiper){
+                        _this.swiper.params.allowSwipeToNext = false;
+                        _this.swiper.params.onSlideChangeEnd = null;
+                        _this.swiper.update();
+                        _this.stageNum++;
+                    }
+
+                    this.swiper.update();
+                    this.swiper.slideNext();
+                }
+            },
+
+            _stageValidCheck: function(btnType){
+                var res = true;
+                var nextIndx = (btnType === 'prev') ? this.swiper.activeIndex-1:this.swiper.activeIndex+1;
+                console.log(nextIndx , this.stageNum)
+                if(nextIndx > this.stageNum){
+                    res = false;
+                    alert(chrome.i18n.getMessage('nextStageNotAllowed'));
+                }
+                return res;
+            },
+
+            _onClickSt1Btn: function(e){
+                e.preventDefault();
+                var trg = $(e.currentTarget);
+                var _this = this;
+
+                if(trg.hasClass(this._options.isSamsung)){
+                    this.mode = "ss";
+                }else{
+                    this.mode = "default";
+                }
+
+                this.stageNum++;
+
+                if(this._stageValidCheck('next')) {
+                    this.swiper.params.allowSwipeToNext = true;
+                    this.swiper.params.onSlideChangeEnd = function(swiper){
+                        _this.swiper.params.allowSwipeToNext = false;
+                        _this.swiper.params.onSlideChangeEnd = null;
+                        _this.swiper.update();
+                    }
+
+                    this.swiper.update();
+                    this.swiper.slideNext();
+                }
             },
 
             datePickerChange: function(e){
@@ -190,6 +327,8 @@
                             localStorage['isTimer'] = 1;
                             if('undefined' !== typeof _this.timerDate) localStorage['timerDate'] = _this.timerDate;
                         }
+
+                        localStorage['mode'] = _this.mode;
                         
                         chrome.windows.create({
                             'url': url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
@@ -210,7 +349,7 @@
             },
 
             timerChange: function(e) {
-                if(e.target.checked){
+                if(e.target.checked && event.target.id === 'timer'){
                     //체크 true
                     //enable input 
                     this.dpInpt.prop('disabled', false);

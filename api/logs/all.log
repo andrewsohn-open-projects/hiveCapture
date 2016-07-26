@@ -107,3 +107,75 @@
 {"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-25T06:07:40.675Z"}
 {"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-25T06:11:21.719Z"}
 {"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-25T06:11:54.288Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:26:02.830Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:30:25.280Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:30:58.663Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:31:46.421Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:35:32.408Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:37:17.340Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:37:54.948Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:38:28.596Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:41:20.103Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:42:25.495Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:43:16.355Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:44:48.726Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:45:35.883Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:46:04.219Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T02:58:06.465Z"}
+{"level":"error","message":"GET 500 webpage.create is not a function","timestamp":"2016-07-26T02:58:21.037Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:01:06.191Z"}
+{"level":"error","message":"GET 500 webpage.create is not a function","timestamp":"2016-07-26T03:01:10.572Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:11:49.200Z"}
+{"level":"error","message":"GET 500 phantom.create is not a function","timestamp":"2016-07-26T03:11:53.029Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:12:57.475Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:15:48.544Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:23:03.425Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:25:01.747Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:25:17.107Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T03:26:16.258Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T04:58:40.974Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:03:04.493Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:03:43.206Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:04:29.100Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:08:41.924Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:11:39.590Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:16:29.266Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:17:09.089Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:25:12.029Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:26:14.154Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:28:52.499Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:30:41.341Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:31:23.049Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:32:46.082Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:34:51.839Z"}
+{"level":"error","message":"GET 500 page.open is not a function","timestamp":"2016-07-26T05:34:54.348Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:35:44.617Z"}
+{"level":"error","message":"GET 500 instance.createPage is not a function","timestamp":"2016-07-26T05:35:45.248Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:36:50.997Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:37:11.046Z"}
+{"level":"error","message":"GET 500 page.open is not a function","timestamp":"2016-07-26T05:37:11.635Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:39:35.123Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:42:40.137Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:43:00.314Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:44:17.829Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:46:23.379Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:47:34.615Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:52:02.280Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:53:03.919Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:55:30.209Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:56:29.140Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:57:43.157Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:58:18.317Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T05:59:28.465Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:12:47.781Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:14:37.168Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:21:44.934Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:26:24.074Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:33:09.619Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:34:05.764Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:35:49.417Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:37:29.640Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:43:50.566Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:46:16.187Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:49:12.560Z"}
+{"level":"info","message":"Express server listening on port 1337","timestamp":"2016-07-26T06:50:26.037Z"}

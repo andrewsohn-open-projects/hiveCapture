@@ -1,11 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var zipdir = require('zip-dir');
-var libs = process.cwd() + '/libs/';
-var webshot = require(libs + 'webshot/webshot');
-
-var config = (require('../config'))['stores']['file']['store'];
+var express = require('express')
+, router = express.Router()
+, fs = require('fs')
+, phantom = require('phantom')
+, zipdir = require('zip-dir')
+, libs = process.cwd() + '/libs/'
+, webshot = require(libs + 'webshot/webshot')
+, config = (require('../config'))['stores']['file']['store']
+, async = require("async");
 
 /* GET Sample API. */
 router.get('/', function (req, res) {
@@ -42,6 +43,10 @@ router.get('/capture', function (req, res) {
 		defaultWhiteBackground: false,
 		customCSS: '', 
 		takeShotOnCallback: false, 
+		// onCallback: function(w, h){
+		// 	// document.body.style.width = w + "px";
+  // 	// 		document.body.style.height = h + "px";
+		// },
 		streamType: 'png', 
 		siteType: 'url', 
 		renderDelay: 0, 
@@ -104,28 +109,177 @@ router.get('/capture', function (req, res) {
 	var filePath = dirPath + '/' + img_name;
 	var img_url = req.headers.host + config.phantom.uploadPath + req.query.uuid + '/' + img_name;
 
-	webshot(url, filePath, options, function(err) {
-		if (err){
-			res.statusCode = 500;
-			log.error('Internal error(%d): %s',res.statusCode,err);
+	if(req.query.mode && req.query.mode == "ss"){
+		async.waterfall([
+			function(cb){
+				//MOBILE IMAGE
+				var sitepage = null;
+				var phInstance = null;
+				var error_code = null;
 
-			return res.json({ 
-				error: err
-			});
-		}
-		
-		return res.json({ 
-			status: 'OK', 
-			url:img_url 
+				phantom.create()
+					.then(instance => {
+				        phInstance = instance;
+				        return instance.createPage();
+				    })
+				    .then(page => {
+				    	sitepage = page;
+				    	page.property('viewportSize', {width: 767});
+				        page.open(url);
+				        return page;
+				    })
+				    .then(page => {
+
+				    	return page.evaluate(function(){
+				    		return document.height;
+				    	});
+				    })
+				    .then(height => {
+				    	sitepage.close();
+				        phInstance.exit();
+
+				        var m_options = options;
+				        var img_m_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '_m.' + config.phantom.ext;
+						var m_filePath = dirPath + '/' + img_m_name;
+
+				        m_options.windowSize.width = 767;
+				        m_options.windowSize.height = height;
+
+				        webshot(url, m_filePath, m_options, function(err) {
+							if (err){
+								error_code = '100';
+								cb(null, error_code);
+							}
+							
+							cb(error_code, '');
+						});
+						
+				    })
+				    .catch(error => {
+				    	phInstance.exit();
+				    	error_code = '400';
+						cb(null, error_code);
+				    });
+			},
+			function(error_code, cb){
+				//PC IMAGE
+				sitepage = null;
+				phInstance = null;
+
+				phantom.create()
+					.then(instance => {
+				        phInstance = instance;
+				        return instance.createPage();
+				    })
+				    .then(page => {
+				    	sitepage = page;
+				    	if(req.query.w){
+							page.property('viewportSize', {width: req.query.w});
+						}else{
+							page.property('viewportSize', {width: 1281});
+						}
+				    	
+				        page.open(url);
+				        return page;
+				    })
+				    .then(page => {
+				    	return page.evaluate(function(){
+				    		return document.height;
+				    	});
+				    })
+				    .then(height => {
+				    	sitepage.close();
+				        phInstance.exit();
+
+				        if(req.query.w){
+							options.windowSize.width = req.query.w;
+						}else{
+							options.windowSize.width = 1281;
+						}
+				        
+				        options.windowSize.height = height;
+
+				        var img_pc_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '_pc.' + config.phantom.ext;
+						var pc_filePath = dirPath + '/' + img_pc_name;
+
+				        webshot(url, pc_filePath, options, function(err) {
+							if (err){
+								error_code = '200';
+								cb(null, error_code);
+							}
+							
+							cb(error_code, '');
+						});
+				    })
+				    .catch(error => {
+				    	phInstance.exit();
+				    	error_code = '400';
+						cb(null, error_code);
+				    });
+			}
+		],
+		function(result){
+			if(result !== null){
+				return res.json({ 
+					error: result
+				});
+			}else{
+				return res.json({ 
+					status: 'OK'
+				});
+			}
 		});
-		// return res.json({
-		// 	"capture":"yes!",
-		// 	"param": req.query,
-		// 	"dir":dirPath,
-		// 	"file":filePath,
-		// 	"img_url":img_url
-		// });
-	});
+	}else{
+		var sitepage = null;
+		var phInstance = null;
+
+		phantom.create()
+			.then(instance => {
+		        phInstance = instance;
+		        return instance.createPage();
+		    })
+		    .then(page => {
+		    	sitepage = page;
+		        page.open(url);
+		        return page;
+		    })
+		    .then(page => {
+		    	return page.evaluate(function(){
+		    		return document.height;
+		    	});
+		    })
+		    .then(height => {
+		    	sitepage.close();
+		        phInstance.exit();
+
+		        options.windowSize.height = height;
+
+		        webshot(url, filePath, options, function(err) {
+					if (err){
+						res.statusCode = 500;
+						log.error('Internal error(%d): %s',res.statusCode,err);
+
+						return res.json({ 
+							error: err
+						});
+					}
+					
+					return res.json({ 
+						status: 'OK', 
+						url:img_url 
+					});
+				});
+		    })
+		    .catch(error => {
+		    	res.statusCode = 500;
+				log.error('Internal error(%d): %s',res.statusCode,error);
+
+				return res.json({ 
+					error: error
+				});
+		        phInstance.exit();
+		    });
+	}
 });
 
 /* GET create Zipped file API. */

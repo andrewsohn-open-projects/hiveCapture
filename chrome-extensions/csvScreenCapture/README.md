@@ -12,6 +12,11 @@ Requires
 
 Change Log
 =====
+ * `v 1.4.3`
+	 * [new feature] Samsung.com User Process
+	 * [new feature] App UI renewed
+
+
  * `v 1.4.2`
 	 * [improved] message.json created in order to support each locale of KO and EN
 	 * [improved] alerts that Site Capturing is expired and dismissed

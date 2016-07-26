@@ -82,8 +82,9 @@
             _initProperties: function(){
                 this.xhr = [];
                 this.isTimer = (parseInt(localStorage['isTimer'], 10) === 1)? true:false;
+                this.mode = localStorage['mode'];
                 this.csvUrl = localStorage['csvUrl'].split(',');
-                // console.log(localStorage, this.isTimer)
+                console.log(localStorage, this.mode)
             },
 
             _assignedHTMLElements: function() {
@@ -309,8 +310,8 @@
                     console.log(this.uuid, this.csvUrl.length, st)
                     var _this = this;
 
-                    var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st + '&isSsPreview=true';
-                    console.log(fullUrl)
+                    var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st + '&mode=' + _this.mode;
+                    console.log(fullUrl);
                     _this.xhr[st] = new XMLHttpRequest();
                     _this.xhr[st].open('GET', fullUrl, true);
                     _this.xhr[st].setRequestHeader('Content-Type', 'application/json');

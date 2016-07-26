@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "__MSG_name__",
     "description": "__MSG_description__",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "content_scripts": [
         {
           "matches": [
