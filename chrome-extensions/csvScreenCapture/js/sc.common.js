@@ -13104,7 +13104,7 @@ sc.ui.config = {
         dots: true,
         arrows: false
     },
-    api_url: 'http://qa.hivelab.co.kr:1337',
+    api_url: 'http://uxd.hivelab.co.kr:1337',
     file_prefix: 'HC'
 };
 
