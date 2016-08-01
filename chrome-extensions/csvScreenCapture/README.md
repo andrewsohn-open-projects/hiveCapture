@@ -12,9 +12,16 @@ Requires
 
 Change Log
 =====
+ * `v 1.4.4` to `v 1.4.6`
+	 * [bug fix] infinite loading process when capturing 
+	 * [bug fix] zip file download button error
+	 * [improved] App UI renewed
+
+
+
  * `v 1.4.3`
 	 * [new feature] Samsung.com User Process
-	 * [new feature] App UI renewed
+	 * [improved] App UI renewed
 
 
  * `v 1.4.2`

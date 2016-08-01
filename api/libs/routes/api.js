@@ -103,7 +103,7 @@ router.get('/capture', function (req, res) {
 		}
 	}
 	
-	domain_name = domain_name.replace('/', '_');
+	domain_name = domain_name.replace(/\//gi, '_');
 
 	var img_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '.' + config.phantom.ext;
 	var filePath = dirPath + '/' + img_name;
@@ -325,7 +325,8 @@ router.get('/proczip', function (req, res) {
 		});
 	}else{
 		return res.json({ 
-			zipName:zipName
+			zipName:zipName,
+			status:'OK'
 		});
 	}
 });
