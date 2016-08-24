@@ -132,11 +132,7 @@ router.get('/capture', function (req, res) {
 				    		page.property('viewportSize', { width: mobileWidth, height: options.windowSize.height });
 				    		page.property('clipRect', { top: 0, left: 0, width: mobileWidth, height: options.windowSize.height });
 				    	
-				    		page.addCookie({
-							  'name'     : 'IW_AUTHENTICATION.P4',
-							  'value'    : '52616e646f6d495648920b3fc0e85135ce07694dbe3f38bf673795911a6c81e6aeded00adbe0ca98c4e2a346260089ef15e856b27eec64d965dae31a8e018935050c7bf08f3c4d7e403ea48c477e0eb6902d16941173f0ddb1e8ded04b14f54a1b97b0bd704128ab380384bba0ae591c',
-							  'domain'   : 'samsung.com'
-							});
+				    		page.addCookie(config.phantom.ssCookieInfo);
 				    	}
 				    	
 				    	page.open(url);
@@ -206,11 +202,7 @@ router.get('/capture', function (req, res) {
 				    		page.property('viewportSize', { width: pc_w, height: options.windowSize.height });
 				    		page.property('clipRect', { top: 0, left: 0, width: pc_w, height: options.windowSize.height });
 				    	
-				    		page.addCookie({
-							  'name'     : 'IW_AUTHENTICATION.P4',
-							  'value'    : '52616e646f6d495648920b3fc0e85135ce07694dbe3f38bf673795911a6c81e6aeded00adbe0ca98c4e2a346260089ef15e856b27eec64d965dae31a8e018935050c7bf08f3c4d7e403ea48c477e0eb6902d16941173f0ddb1e8ded04b14f54a1b97b0bd704128ab380384bba0ae591c',
-							  'domain'   : 'samsung.com'
-							});
+				    		page.addCookie(config.phantom.ssCookieInfo);
 				    	}
 
 				        page.open(url);
@@ -289,11 +281,7 @@ router.get('/capture', function (req, res) {
 		    		page.property('viewportSize', { width: 1281, height: options.windowSize.height });
 		    		page.property('clipRect', { top: 0, left: 0, width: 1281, height: options.windowSize.height });
 		    	
-		    		page.addCookie({
-					  'name'     : 'IW_AUTHENTICATION.P4',
-					  'value'    : '52616e646f6d495648920b3fc0e85135ce07694dbe3f38bf673795911a6c81e6aeded00adbe0ca98c4e2a346260089ef15e856b27eec64d965dae31a8e018935050c7bf08f3c4d7e403ea48c477e0eb6902d16941173f0ddb1e8ded04b14f54a1b97b0bd704128ab380384bba0ae591c',
-					  'domain'   : 'samsung.com'
-					});
+		    		page.addCookie(config.phantom.ssCookieInfo);
 		    	}
 		    	
 		        page.open(url);
