@@ -1,98 +1,67 @@
 <!DOCTYPE html>
 <html lang="ko" class="ui-mobile">
-    <head>
-    	<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
-		<title>HiveCapture :: Screen Capture Tool</title>
-		<link rel="stylesheet" href="./css/hiveCapture.min.css" />
-		<link href="./css/bootstrap-combined.min.css" rel="stylesheet">
-    	<link rel="stylesheet" type="text/css" media="screen" href="./css/bootstrap-datetimepicker.min.css">
-    	<link rel="stylesheet" type="text/css" href="./css/swiper.min.css">
-        <script src="./js/sc.common.js"></script>
-        <script src="./js/sc.datepicker.js"></script>
-        <script src="./js/sc.js"></script>
-        <style>
-            body {min-height:350px;min-width:300px;}
-            .dimmed{position:fixed;left:0;top:0;right:0;bottom:0;opacity:0.7;background-color:#fff;}
-            .loading-box{position:fixed;left:0;top:0;right:0;bottom:0;width:120px;height:120px;margin:auto;background:url(./img/loading.gif) no-repeat;}
-            .ui-header h1{margin:0;padding:0;font-size:1em;display:inline-block}
-            .ui-checkbx { display: inline; }
-            .ui-checkbx label{ display: inline; }
-            #datetimepicker {display: inline;}
-        </style>
-    </head>
-    <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
-    	<div data-role="page" data-theme="a">
-    		<header class="ui-header" data-role="header" data-position="inline">
-    			<h1>HiveCapture Screen Capture Tool</h1>
-			</header>
-			<div data-role="content" data-theme="a">
-				<div class="swiper_cont swiper-container">
-					<ul class="swiper-wrapper">
-						<li class="swiper-slide js-stage-1" data-no="" data-img="">
-							<div>
-								<div class="ui-checkbx btns">
-									<a href="#" class="js-isSamsung">User for Samsung.com</a>
-									<a href="#" class="js-isOthers">Others</a>
-								</div>
-								<a href="#" class="js-slide-next">next</a>
-							</div>
-						</li>
-						<li class="swiper-slide" data-no="" data-img="">
-							<div>
-								<h3>타이머 설정</h3>
-								<div class="ui-checkbx">
-									<input type="radio" name="isTimer" id="timer" value="true">
-									<label for="timer">날짜/시간 선택</label>
-									<input type="radio" name="isTimer" id="direct" value="false" checked>
-									<label for="direct">사용 안함</label>
-								</div>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+	<title>HiveCapture :: Screen Capture Tool</title>
+	<link href="./css/bootstrap-combined.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" media="screen" href="./css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="./css/hivecapture.css" />
+	<script src="./js/sc.common.js"></script>
+	<script src="./js/sc.datepicker.js"></script>
+	<script src="./js/sc.js"></script>
+</head>
+<body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
 
-								<div id="datetimepicker" class="input-append date" style="text-align:right;">
-							      <input type="text" style="width:200px;" disabled/>
-							      <span class="add-on" style="display:none;">
-							        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-							      </span>
-							    </div>
-							    <a href="#" class="js-slide-prev">previous</a>
-							    <a href="#" class="js-slide-next">next</a>
-							</div>
-						</li>
-						<li class="swiper-slide" data-no="" data-img="">
-							<div>
-								<h3>발사!</h3>
-								<div class="ui-grid-solo ele-stage-1">
-									<div class="ui-block-a"><button type="button" id="csvDnldBtn" class="ui-btn ui-shadow ui-corner-all">CSV 템플릿 다운로드</button></div>
-								</div>
-								<div class="ui-grid-solo ele-stage-1">
-									<div class="ui-block-a"><button type="button" id="csvInsrtBtn" class="ui-btn ui-shadow ui-corner-all">CSV 첨부</button>
-									</div>
-								</div>
-								<a href="#" class="js-slide-prev">previous</a>
-							</div>
-						</li>
-					</ul>
+<div class="wrap" data-role="page" data-theme="a">
+
+	<header class="ui-header" data-role="header" data-position="inline">
+		<h1>Hive Capture</h1>
+		<p class="version js-app-version"></p>
+	</header>
+
+	<div class="content">
+		<section class="set-option">
+			<ul>
+			<li class="set-mscreen">
+				<input type="checkbox" id="check-mscreen">
+				<label for="check-mscreen">Width mobile screen</label>
+				<input type="text" id="screen-unit" class="inp-basic" value="360"/>
+				<label for="screen-unit">px</label>
+			</li>
+			<li class="set-timer">
+				<input type="checkbox" name="isTimer" id="check-timer">
+				<label for="check-timer">Set Timer</label>
+
+				<div class="input-append date" id="datetimepicker" style="text-align:right;">
+    				<input type="text" class="inp-basic" />
+					<span class="add-on">
+					<i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+					</span>
 				</div>
-				
-				<div class="ui-grid-solo ele-stage-2" style="display: none;">
-					<div class="ui-block-a"><button type="button" class="btn_capture" class="ui-btn ui-shadow ui-corner-all">일괄 캡처</button>
-					</div>
-				</div>
+			</li>
+			</ul>
+		</section>
+		<section class="btn-cvs">
+			<button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
+			<button type="button" id="csvDnldBtn" class="btn-basic">CSV 템플릿 다운로드</button>
+		</section>
+		<section class="content-foot">
+			<button type="submit" class="btn-basic js-submit-btn">Submit</button>
+		</section>
+	</div>
 
-				
-			</div>
-
-			<div class="dimmed" style="display: none;"></div>
+	<div class="dimmed" style="display: none;"></div>
 			<input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
 
-			<footer>
-				<div class="logo"><img src="img/logo-hivelab.png" alt="hivelab"></div>
-			</footer>
-    	</div>
+	<footer>
+		<div class="logo"><img src="img/logo-hivelab.png" alt="hivelab"></div>
+	</footer>
+</div>
 		<!-- 
-		* This file is part of the hiveCapture.
+		* This file is part of the HiveCapture tool.
  		*
- 		* https://github.com/andrewsohn/hiveCapture
+ 		* https://github.com/hivelab-open-projects/hiveCapture
  		* 
  		* Copyright 2016, Andrew Sohn
  		* hivelab Co., Ltd
@@ -102,5 +71,5 @@
  		* 
  		* Released on: February 7, 2016
 		-->
-    </body>
+	</body>
 </html>

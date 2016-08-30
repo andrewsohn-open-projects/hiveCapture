@@ -16,6 +16,7 @@ Change Log
 	 * [bug fix] infinite loading process when capturing 
 	 * [bug fix] zip file download button error
 	 * [improved] App UI renewed
+	 * [improved] Samsung.com User Preview Stage View provided
 
 
 

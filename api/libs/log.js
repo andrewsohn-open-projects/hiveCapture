@@ -33,3 +33,4 @@ function getFilePath (module ) {
 }
 
 module.exports = logger;
+

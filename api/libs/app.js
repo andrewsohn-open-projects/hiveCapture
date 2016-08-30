@@ -2,17 +2,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var passport = require('passport');
 var methodOverride = require('method-override');
 
 var libs = process.cwd() + '/libs/';
-require(libs + 'auth/auth');
-
-var webshot = require(libs + 'webshot/webshot');
 
 var config = require('./config');
 var log = require('./log')(module);
-var oauth2 = require('./auth/oauth2');
 
 var test = require('./routes/test');
 var api = require('./routes/api');
@@ -27,7 +22,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(methodOverride());
-app.use(passport.initialize());
 
 app.use('/', test);
 app.use('/api', api);
