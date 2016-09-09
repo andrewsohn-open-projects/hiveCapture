@@ -107,9 +107,14 @@ router.get('/capture', function (req, res) {
 	var isSs = (new RegExp('.samsung.com')).test(url);
 	var isSsPreview = (new RegExp('preview4.samsung.com')).test(url);
 	var documentHeight;
-	
+
 	if(req.query.isMobile && req.query.isMobile == "1"){
 		var mobileWidth = (req.query.mobileWidth)? parseInt(req.query.mobileWidth):360;
+		var img_m_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '_m.' + config.phantom.ext;
+		var m_filePath = dirPath + '/' + img_m_name;
+
+		var img_pc_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '_pc.' + config.phantom.ext;
+		var pc_filePath = dirPath + '/' + img_pc_name;
 
 		async.waterfall([
 			function(cb){
@@ -119,7 +124,7 @@ router.get('/capture', function (req, res) {
 						"transport": "http",
 						"ssl-protocol": "tlsv1",
 						"ignore-ssl-errors": true
-			        },
+					},
 					casper: {
 						logLevel: 'debug',
 						verbose: true,
@@ -130,7 +135,7 @@ router.get('/capture', function (req, res) {
 							userAgent: options.useragent.m
 						},
 						viewportSize:{
-							width:1280, height:1024
+							width:mobileWidth, height:1024
 						}
 					}
 				}, function (err) {
@@ -139,34 +144,34 @@ router.get('/capture', function (req, res) {
 						e.details = err;
 						throw e;
 					}
-					
+
 					spooky.start(url);
 
 					spooky.waitFor(function check(){
 						documentHeight = this.evaluate(function() {
-					        return __utils__.getDocumentHeight();
-					    });
-					    
-					    var _this = this
-					    , h = 0;
+							return __utils__.getDocumentHeight();
+						});
+		    
+						var _this = this
+						, h = 0;
 
-					    while(h<documentHeight){
-					    	_this.scrollTo(100, h);
-					    	_this.wait(600);
-					    	h = h + 300;
-					    }
+						while(h<documentHeight){
+							_this.scrollTo(100, h);
+							_this.wait(600);
+							h = h + 300;
+						}
 
-					    return true;
+						return true;
 					}, function then(){
-						
+			
 					});
 
 					spooky.then([{
-						filePath:filePath
+						m_filePath:m_filePath
 					}, function() {
 						this.scrollToBottom();
-						this.emit('console', filePath);
-						this.capture(filePath);
+						this.emit('console', m_filePath);
+						this.capture(m_filePath);
 					}]);
 
 					spooky.run(function(){
@@ -191,46 +196,29 @@ router.get('/capture', function (req, res) {
 				spooky.on('console', function (line) {
 				    console.log(line);
 				});
-				
+
+
+				spooky.on('hello', function (greeting) {
+				    console.log(greeting);
+				});
+
 				spooky.on('complete', function (isComplete) {
 				    if(isComplete) cb(error_code, '');
 				});
 
-				spooky.on('hello', function (greeting) {
-					console.log('We in the CasperJS context');
-					console.log(greeting);
-				});
-
 				spooky.on('log', function (log) {
-					if (log.space === 'remote') {
-						console.log(log.message.replace(/ \- .*/, ''));
-					}
+				    if (log.space === 'remote') {
+				        console.log(log.message.replace(/ \- .*/, ''));
+				    }
 				});
-			}
-		],
-		function(result){
-			if(result !== null){
-				return res.json({ 
-					error: result
-				});
-			}else{
-				return res.json({ 
-					status: 'OK', 
-					url:img_url
-				});
-			}
-		});
-
-	}else{
-		async.waterfall([
-			function(cb){
-				var error_code = null;
+			},
+			function(error_code, cb){
 				var spooky = new Spooky({
 					child: {
 						"transport": "http",
 						"ssl-protocol": "tlsv1",
 						"ignore-ssl-errors": true
-			        },
+					},
 					casper: {
 						logLevel: 'debug',
 						verbose: true,
@@ -250,34 +238,34 @@ router.get('/capture', function (req, res) {
 						e.details = err;
 						throw e;
 					}
-					
+
 					spooky.start(url);
 
 					spooky.waitFor(function check(){
 						documentHeight = this.evaluate(function() {
-					        return __utils__.getDocumentHeight();
-					    });
-					    
-					    var _this = this
-					    , h = 0;
+							return __utils__.getDocumentHeight();
+						});
+		    
+						var _this = this
+						, h = 0;
 
-					    while(h<documentHeight){
-					    	_this.scrollTo(100, h);
-					    	_this.wait(600);
-					    	h = h + 300;
-					    }
+						while(h<documentHeight){
+							_this.scrollTo(100, h);
+							_this.wait(600);
+							h = h + 300;
+						}
 
-					    return true;
+						return true;
 					}, function then(){
-						
+			
 					});
 
 					spooky.then([{
-						filePath:filePath
+						pc_filePath:pc_filePath
 					}, function() {
 						this.scrollToBottom();
-						this.emit('console', filePath);
-						this.capture(filePath);
+						this.emit('console', pc_filePath);
+						this.capture(pc_filePath);
 					}]);
 
 					spooky.run(function(){
@@ -302,20 +290,20 @@ router.get('/capture', function (req, res) {
 				spooky.on('console', function (line) {
 				    console.log(line);
 				});
-				
+
+
+				spooky.on('hello', function (greeting) {
+				    console.log(greeting);
+				});
+
 				spooky.on('complete', function (isComplete) {
 				    if(isComplete) cb(error_code, '');
 				});
 
-				spooky.on('hello', function (greeting) {
-					console.log('We in the CasperJS context');
-					console.log(greeting);
-				});
-
 				spooky.on('log', function (log) {
-					if (log.space === 'remote') {
-						console.log(log.message.replace(/ \- .*/, ''));
-					}
+				    if (log.space === 'remote') {
+				        console.log(log.message.replace(/ \- .*/, ''));
+				    }
 				});
 			}
 		],
@@ -331,7 +319,116 @@ router.get('/capture', function (req, res) {
 				});
 			}
 		});
-	}
+	}else{
+		async.waterfall([
+			function(cb){
+				var error_code = null;
+				var spooky = new Spooky({
+					child: {
+						"transport": "http",
+						"ssl-protocol": "tlsv1",
+						"ignore-ssl-errors": true
+					},
+					casper: {
+						logLevel: 'debug',
+						verbose: true,
+						sslProtocol: "tlsv1",
+						pageSettings: {
+							loadImages:  true,         // The WebPage instance used by Casper 
+							loadPlugins: false,         // use these settings
+							userAgent: options.useragent.pc
+						},
+						viewportSize:{
+							width:1280, height:1024
+						}
+					}
+				}, function (err) {
+					if (err) {
+						e = new Error('Failed to initialize SpookyJS');
+						e.details = err;
+						throw e;
+					}
+
+//					spooky.start(url);
+spooky.start("https://chrome.google.com/webstore/category/apps?utm_source=chrome-ntp-icon");
+					spooky.waitFor(function check(){
+						documentHeight = this.evaluate(function() {
+							return __utils__.getDocumentHeight();
+						});
+		    
+						var _this = this
+						, h = 0;
+
+						while(h<documentHeight){
+							_this.scrollTo(100, h);
+							_this.wait(600);
+							h = h + 300;
+						}
+
+						return true;
+					}, function then(){
+			
+					});
+
+					spooky.then([{
+						filePath:filePath
+					}, function() {
+						this.scrollToBottom();
+						this.emit('console', filePath);
+						this.capture(filePath);
+					}]);
+
+					spooky.run(function(){
+						this.emit('complete', true);
+					});
+				});
+
+				spooky.on('error', function (e, stack) {
+					console.error(e);
+
+					if (stack) {
+						console.log(stack);
+					}
+				});
+
+				/*
+				// Uncomment this block to see all of the things Casper has to say.
+				// There are a lot.
+				// He has opinions.
+				*/
+				spooky.on('console', function (line) {
+				    console.log(line);
+				});
+
+
+				spooky.on('hello', function (greeting) {
+				    console.log(greeting);
+				});
+
+				spooky.on('complete', function (isComplete) {
+				    if(isComplete) cb(error_code, '');
+				});
+
+				spooky.on('log', function (log) {
+				    if (log.space === 'remote') {
+				        console.log(log.message.replace(/ \- .*/, ''));
+				    }
+				});        
+			}
+		],
+		function(result){
+			if(result !== null){
+				return res.json({ 
+					error: result
+				});
+			}else{
+				return res.json({ 
+					status: 'OK', 
+					url:img_url
+				});
+			}
+		});
+	}	
 });
 
 /* GET create Zipped file API. */
