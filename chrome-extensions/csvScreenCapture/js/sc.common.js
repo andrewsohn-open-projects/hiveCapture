@@ -13083,7 +13083,7 @@ b.params.hashnav&&b.hashnav&&b.hashnav.init(),b.params.a11y&&b.a11y&&b.a11y.init
  * This file is part of the hiveCapture.
  * Requires jQuery 1.12.0
  *
- * https://github.com/andrewsohn/hiveCapture
+ * https://github.com/hivelab-open-projects/hiveCapture
  * 
  * Copyright 2016, Andrew Sohn
  * hivelab Co., Ltd

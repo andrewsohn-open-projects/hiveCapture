@@ -2,7 +2,7 @@
  * This file is part of the hiveCapture.
  * Requires jQuery 1.12.0
  *
- * https://github.com/andrewsohn/hiveCapture
+ * https://github.com/hivelab-open-projects/hiveCapture
  * 
  * Copyright 2016, Andrew Sohn
  * hivelab Co., Ltd
@@ -13,10 +13,6 @@
  * Released on: February 24, 2016
  */
 
- /**
- * Brazilian translation for bootstrap-datetimepicker
- * Cauan Cabral <cauan@radig.com.br>
- */
 ;
 (function($, window, document, undefined) {
     'use strict';    
@@ -37,25 +33,22 @@
                         tmpl: '.csvListTmpl'
                     },
                     submit: {
-                        form: 'form[name=sForm]', 
-                        urls: 'input[name=urls]', 
-                        btn: '.btn_capture'
+                        btn: '.js-submit-btn'
                     },
-                    dimmed: {
-                        cont: '.dimmed'
+                    mobile: {
+                        cont: 'set-mscreen',
+                        btn: '#check-mscreen',
+                        ele: '#screen-unit'
                     },
                     datepicker: {
                         ele: '#datetimepicker',
                         inpt: 'input[type=text]',
-                        dpBtn: '.add-on',
-                        timerBtn: 'input[name=isTimer]'
+                        dpBtn: '.add-on i',
+                        timerBtn: 'input[name=isTimer]',
+                        li: 'set-timer'
                     },
-                    swiper: {
-                        cont: '.swiper-container',
-                        arrow: {
-                            prev: '.js-slide-prev',
-                            next: '.js-slide-next'
-                        }
+                    options: {
+                        cont: '.set-option'
                     },
                     stage: {
                         stage1: '.js-stage-1',
@@ -64,7 +57,10 @@
                         backBtn: '.ui-icon-carat-l'
                     },
                     isSamsung: "js-isSamsung",
+                    version: ".js-app-version",
+                    cl_check: "selected",
                     csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
+                    mWidthValue: '360',
                     actionUrl: './extract.html'
                 };
 
@@ -72,43 +68,19 @@
 
                 this.container = container;
                 this._assignedHTMLElements();
+                this._setAppVersion();
                 this._initProperties();
-                this._sigletone();
                 this._attachEvents();
             },
 
-            _sigletone: function() {
-                var _this = this;
-
-                (function() {
-                    _this.swiperCont.swiper({
-                        mode: 'horizontal',
-                        watchActiveIndex: true,
-                        loop: false,
-                        allowSwipeToPrev:false,
-                        allowSwipeToNext:false,
-                        touchMoveStopPropagation:false,
-                        onSlideChangeStart:function(swiper){
-
-                        },
-                        slidesPerView: 1,
-                        onInit: function(swiper) {
-                            _this.swiper = swiper;
-                        }
-                    });
-                })();
-
-                return _this.swiper;
-            },
-
-            _initProperties: function() {
-                this.mode = "default";
-                this.stageNum = 0;
-                this.xhr = [];
-                this.isTimer = false;
+            _setAppVersion: function(){
+                this.version.text(chrome.runtime.getManifest().version);
             },
 
             _assignedHTMLElements: function() {
+                // Version
+                this.version = this.container.find(this._options.version);
+
                 // CSV Element
                 this.btn = this.container.find(this._options.csvEle.btn);
                 this.downTempBtn = this.container.find(this._options.csvEle.downTempBtn);
@@ -116,24 +88,30 @@
                 this.table = this.container.find(this._options.csvEle.table);
                 this.list = this.table.find(this._options.csvEle.listCont);
 
+                // set-option
+                this.optionCont = this.container.find(this._options.options.cont);
+                
+                // mobile screen
+                this.mobileCont = this.optionCont.find('.'+this._options.mobile.cont);
+                this.mobileBtn = this.mobileCont.find(this._options.mobile.btn);
+                this.mobileOpt = this.mobileCont.find(this._options.mobile.ele);
+
+                
                 // SWIPER
-                this.swiperCont = this.container.find(this._options.swiper.cont);
-                this.slidePrevBtn = this.swiperCont.find(this._options.swiper.arrow.prev);
-                this.slideNextBtn = this.swiperCont.find(this._options.swiper.arrow.next);
+                // this.swiperCont = this.container.find(this._options.swiper.cont);
+                // this.slidePrevBtn = this.swiperCont.find(this._options.swiper.arrow.prev);
+                // this.slideNextBtn = this.swiperCont.find(this._options.swiper.arrow.next);
                 
                 // STAGE 1
-                this.stage1Cont = this.swiperCont.find(this._options.stage.stage1);
-                this.stage1Btns = this.stage1Cont.find(this._options.stage.stage1Btns);
+                // this.stage1Cont = this.swiperCont.find(this._options.stage.stage1);
+                // this.stage1Btns = this.stage1Cont.find(this._options.stage.stage1Btns);
 
                 // STAGE 2
                 // this.eleStage2 = this.container.find(this._options.stage.stage2);
-                this.backBtn = this.container.find(this._options.stage.backBtn);
+                // this.backBtn = this.container.find(this._options.stage.backBtn);
                 // this.listTmpl = this.container.find(this._options.csvEle.tmpl);
                 // this.idown = $('<iframe>', { id: 'idown', src: '' }).hide().appendTo(this.container);
 
-                this.dimmed = this.container.find(this._options.dimmed.cont);
-                this.urls = this.container.find(this._options.submit.urls);
-                // console.log(this.urls)
                 this.submitBtn = this.container.find(this._options.submit.btn);
 
                 //datepicker
@@ -145,112 +123,43 @@
                 this.timerBtn = this.container.find(this._options.datepicker.timerBtn);
             },
 
-            _attachEvents: function() {
-                this.stage1Btns.on('click', $.proxy(this._onClickSt1Btn, this));
-                this.btn.on('click', $.proxy(this._onClickBtn, this));
-                this.downTempBtn.on('click', $.proxy(this._onClickTempBtn, this));
-                this.fileEle.on('change', $.proxy(this._onFileChange, this));
-                this.timerBtn.on('change', $.proxy(this.timerChange, this));
+            _initProperties: function() {
+                var prevDate = new Date(),
+                _this = this;
 
-                var prevDate = new Date();
+                this.mobileOpt.prop('readonly', true);
+
                 prevDate.setDate(prevDate.getDate()-1);
 
                 this.dp.datetimepicker({
                     format: 'dd/MM/yyyy hh:mm:ss',
                     language: 'kr',
-                    startDate: prevDate
-                }).on('changeDate', $.proxy(this.datePickerChange, this));
+                    startDate: prevDate,
+                    init: function(dp){
+                        _this.datetimepicker = dp;
+                    }
+                })
+                    .on('changeDate', $.proxy(this.datePickerChange, this));
 
+                if('undefined' !== typeof this.datetimepicker) this.datetimepicker.disable();
+                this.dpBtn.css({'cursor':'not-allowed'});
 
-                //Slide Prev / Next buttons
-                this.slidePrevBtn.on('click', $.proxy(this._onClickPrevBtn, this));
-                this.slideNextBtn.on('click', $.proxy(this._onClickNextBtn, this));
+                this.xhr = [];
+                this.isMobile = false;
             },
 
-            _onClickPrevBtn: function(e){
-                e.preventDefault();
-                var trg = $(e.currentTarget);
-                var _this = this;
+            _attachEvents: function() {
+                // this.stage1Btns.on('click', $.proxy(this._onClickSt1Btn, this));
+                this.btn.on('click', $.proxy(this._onClickBtn, this));
+                this.downTempBtn.on('click', $.proxy(this._onClickTempBtn, this));
 
-                if(this.swiper.activeIndex === 2) _this.stageNum--;
+                this.fileEle.on('change', $.proxy(this._onFileChange, this));
                 
-                if(this._stageValidCheck('prev')) {
-                    this.swiper.params.allowSwipeToPrev = true;
-                    this.swiper.params.onSlideChangeEnd = function(swiper){
-                        _this.swiper.params.allowSwipeToPrev = false;
-                        _this.swiper.params.onSlideChangeEnd = null;
-                        _this.swiper.update();
-                        _this.stageNum--;
-                    }
+                this.mobileBtn.on('change', $.proxy(this._onMobileBtnChange, this));
+                this.timerBtn.on('change', $.proxy(this.timerChange, this));
+                // this.optionLi.on('change', $.proxy(this._onOptionChange, this));
 
-                    this.swiper.update();
-                    this.swiper.slidePrev();
-                }
-            },
-
-            _onClickNextBtn: function(e){
-                e.preventDefault();
-                var trg = $(e.currentTarget);
-                var _this = this;
-                
-                //STAGE2에서는 default로 '사용 안함'버튼 checked 
-                if(this.swiper.activeIndex === 1){
-                    if(this.timerBtn.filter(':checked').attr('id') === 'timer'){
-                        if(this.dpInpt.val().length > 0) _this.stageNum++;
-                    }else{
-                        _this.stageNum++;
-                    }
-                }
-
-                if(this._stageValidCheck('next')) {
-                    this.swiper.params.allowSwipeToNext = true;
-                    this.swiper.params.onSlideChangeEnd = function(swiper){
-                        _this.swiper.params.allowSwipeToNext = false;
-                        _this.swiper.params.onSlideChangeEnd = null;
-                        _this.swiper.update();
-                        _this.stageNum++;
-                    }
-
-                    this.swiper.update();
-                    this.swiper.slideNext();
-                }
-            },
-
-            _stageValidCheck: function(btnType){
-                var res = true;
-                var nextIndx = (btnType === 'prev') ? this.swiper.activeIndex-1:this.swiper.activeIndex+1;
-                console.log(nextIndx , this.stageNum)
-                if(nextIndx > this.stageNum){
-                    res = false;
-                    alert(chrome.i18n.getMessage('nextStageNotAllowed'));
-                }
-                return res;
-            },
-
-            _onClickSt1Btn: function(e){
-                e.preventDefault();
-                var trg = $(e.currentTarget);
-                var _this = this;
-
-                if(trg.hasClass(this._options.isSamsung)){
-                    this.mode = "ss";
-                }else{
-                    this.mode = "default";
-                }
-
-                this.stageNum++;
-
-                if(this._stageValidCheck('next')) {
-                    this.swiper.params.allowSwipeToNext = true;
-                    this.swiper.params.onSlideChangeEnd = function(swiper){
-                        _this.swiper.params.allowSwipeToNext = false;
-                        _this.swiper.params.onSlideChangeEnd = null;
-                        _this.swiper.update();
-                    }
-
-                    this.swiper.update();
-                    this.swiper.slideNext();
-                }
+                this.submitBtn.on('click', $.proxy(this._onSubmit, this));
             },
 
             datePickerChange: function(e){
@@ -318,23 +227,19 @@
 
                         _this.csvval = csvval;
                         // _this.urls.val(_this.csvval.join());
-                        var url = _this._options.actionUrl;
+                        _this.url = _this._options.actionUrl;
 
-                        localStorage['csvUrl'] = _this.csvval.join();
-                        localStorage['isTimer'] = 0;
-                        // 타이머 모드 설정
-                        if(_this.isTimer){
-                            localStorage['isTimer'] = 1;
-                            if('undefined' !== typeof _this.timerDate) localStorage['timerDate'] = _this.timerDate;
+                        var csvval_arr = _this.csvval.join();
+
+                        if(!csvval_arr.length) {
+                            alert(chrome.i18n.getMessage('emptyFile'));
+                            return false;
                         }
 
-                        localStorage['mode'] = _this.mode;
+
+                        _this.csvUrls = csvval_arr;
                         
-                        chrome.windows.create({
-                            'url': url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
-                        }, function(win){
-                           window.close(); 
-                        });
+                        _this.isFileAttached = true;
                     };
                     reader.readAsText(e.target.files.item(0));
                 }
@@ -348,24 +253,74 @@
                 this.fileEle.trigger('click');
             },
 
+            _onSubmit: function(e) {
+                e.preventDefault();
+                var target = $(e.currentTarget)
+                , _this = this;
+
+                if('undefined' === typeof _this.isFileAttached){
+                    alert(chrome.i18n.getMessage('fileNotAttached'));
+                    return false;
+                }
+
+                // Extra Setting Values
+                localStorage.clear();
+                localStorage['csvUrl'] = _this.csvUrls;
+                localStorage['isMobile'] = 0;
+                localStorage['isTimer'] = 0;
+
+                // 모바일 캡처 설정
+                if(_this.mobileBtn.is(':checked')){
+                    localStorage['isMobile'] = 1;
+                    if('' !== _this.mobileOpt.val()) localStorage['mobileWidth'] = _this.mobileOpt.val();
+                }
+
+                // 타이머 모드 설정
+                if(_this.timerBtn.is(':checked')){
+                    localStorage['isTimer'] = 1;
+                    if('undefined' !== typeof _this.timerDate) localStorage['timerDate'] = _this.timerDate;
+                }
+
+                chrome.windows.create({
+                    'url': _this.url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
+                }, function(win){
+                   window.close(); 
+                });
+            },
+
             timerChange: function(e) {
-                if(e.target.checked && event.target.id === 'timer'){
+                var li = $(e.currentTarget).parents('li.'+this._options.datepicker.li);
+                
+                if(e.target.checked){
                     //체크 true
                     //enable input 
-                    this.dpInpt.prop('disabled', false);
-
-                    //enable button
-                    this.dpBtn.show();
                     this.isTimer = true;
+                    this.dpBtn.css({'cursor':'pointer'});
+                    this.datetimepicker.enable();
+
+                    if(!li.hasClass(this._options.cl_check)) li.addClass(this._options.cl_check);
                 }else{
                     //체크 false
                     //disable input 
-                    this.dpInpt.prop('disabled', true);
                     if(this.dpInpt.val().length) this.dpInpt.val('');
 
-                    //disable button
-                    this.dpBtn.hide();
                     this.isTimer = false;
+                    this.dpBtn.css({'cursor':'not-allowed'});
+                    this.datetimepicker.disable();
+                    if(li.hasClass(this._options.cl_check)) li.removeClass(this._options.cl_check);
+                }
+            },
+
+            _onMobileBtnChange: function(e) {
+                var li = $(e.currentTarget).parents('li.'+this._options.mobile.cont);
+
+                if(e.target.checked){
+                    this.mobileOpt.prop('readonly', false);
+                    if(!li.hasClass(this._options.cl_check)) li.addClass(this._options.cl_check);
+                }else{
+                    this.mobileOpt.prop('readonly', true);
+                    if(this.mobileOpt.val().length) this.mobileOpt.val(this._options.mWidthValue);
+                    if(li.hasClass(this._options.cl_check)) li.removeClass(this._options.cl_check);
                 }
             }
         };
@@ -377,4 +332,3 @@
         sc.ui.Entry.init(container);
     });
 })(jQuery, window, document);
-

@@ -17,8 +17,14 @@
     "firstInvalid": {
         "message":"Sorry, the first URL could not be found.\nPlease try again."
     },
-    "nextStageNotAllowed": {
-        "message":"Invalid approach to the next stage.\nPlease try again."
+    "emptyFile": {
+        "message":"Sorry, there is a none of valid URLs found in the CSV file\nPlease try again."
+    },
+    "fileNotAttached": {
+        "message":"Please attach a CSV file first before proceeding."
+    },
+    "outOfCsvUrl": {
+        "message":"Sorry, there is no URLs to capture.\nPlease try again."
     },
     "erorrRedirect": {
         "message":"Unfortunately, the process has been terminated due to 404 error occured capturing the $nth$ th URL.\nIt will proceed to result page.",

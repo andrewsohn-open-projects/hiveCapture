@@ -2,7 +2,7 @@
  * This file is part of the hiveCapture.
  * Requires jQuery 1.12.0
  *
- * https://github.com/andrewsohn/hiveCapture
+ * https://github.com/hivelab-open-projects/hiveCapture
  * 
  * Copyright 2016, Andrew Sohn
  * hivelab Co., Ltd
@@ -36,15 +36,12 @@
             init: function(container, options) {
                 this._defaults = {
                     csvEle: {
-                        btn: '#csvInsrtBtn',
-                        downTempBtn: '#csvDnldBtn',
-                        inpt: 'input[name=csv]', 
-                        table: '.csv_table', 
-                        listCont: '.csvList', 
+                        listCont: '.js-csvListCont',
+                        list: '.js-csvList',
+                        num: '.js-listCount',
                         tmpl: '.csvListTmpl'
                     },
                     submit: {
-                        form: 'form[name=sForm]', 
                         urls: 'input[name=urls]', 
                         prefix: 'input[name=prefix]', 
                         btn: '.btn_capture'
@@ -55,16 +52,20 @@
                     stage: {
                         stage1: '.ele-stage-1',
                         stage2: '.ele-stage-2',
-                        stage3: '.ele-stage-3',
-                        stage4: '.ele-stage-4',
                     },
                     timer: {
                         ele: '#timer'
+                    },
+                    serverStatus : {
+                        ele: '.server-status',
+                        clPrefix: 'st-',
+                        version: ".js-app-version"
                     },
                     destUrl: './result.html', 
                     getCapturedImg: _config.api_url + '/api/capture',
                     getUuid: _config.api_url + '/uuid',
                     csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
+                    getTestUrl: _config.api_url,
                     actionUrl: './extract.html',
                     defaultPrefix: _config.file_prefix
                 };
@@ -75,67 +76,65 @@
 
                 this._initProperties();
                 this._assignedHTMLElements();
+                this._serverCheck();
                 this._attachEvents();
                 this._onListUp();
             },
 
             _initProperties: function(){
                 this.xhr = [];
+                this.pwSwitch = false;
                 this.isTimer = (parseInt(localStorage['isTimer'], 10) === 1)? true:false;
-                this.mode = localStorage['mode'];
+                this.isMobile = localStorage['isMobile'];
                 this.csvUrl = localStorage['csvUrl'].split(',');
-                console.log(localStorage, this.mode)
             },
 
             _assignedHTMLElements: function() {
                 // CSV Element
-                this.btn = this.container.find(this._options.csvEle.btn);
-                this.downTempBtn = this.container.find(this._options.csvEle.downTempBtn);
-                this.fileEle = this.container.find(this._options.csvEle.inpt);
-                this.table = this.container.find(this._options.csvEle.table);
-                this.list = this.table.find(this._options.csvEle.listCont);
-
+                this.listCont = this.container.find(this._options.csvEle.listCont);
+                this.list = this.listCont.find(this._options.csvEle.list);
+                this.numEle = this.listCont.find(this._options.csvEle.num);
                 this.eleStage1 = this.container.find(this._options.stage.stage1);
                 this.eleStage2 = this.container.find(this._options.stage.stage2);
-                this.eleStage3 = this.container.find(this._options.stage.stage3);
-                this.eleStage4 = this.container.find(this._options.stage.stage4);
-                // this.listTmpl = this.container.find(this._options.csvEle.tmpl);
-                // this.idown = $('<iframe>', { id: 'idown', src: '' }).hide().appendTo(this.container);
-
+                
                 //Timer
-                this.timerEle = this.eleStage4.find(this._options.timer.ele);
+                this.timerEle = this.eleStage2.find(this._options.timer.ele);
 
                 this.dimmed = this.container.find(this._options.dimmed.cont);
                 this.urls = this.container.find(this._options.submit.urls);
                 this.submitBtn = this.container.find(this._options.submit.btn);
+
+                //server status
+                this.serverStatus = this.container.find(this._options.serverStatus.ele);
+                this.serverStatusTx = this.serverStatus.find('em');
+                this.version = this.container.find(this._options.serverStatus.version);
             },
 
-            _initImgData: function() {
-                this.xhr = [];
-                var _this = this;
+            _serverCheck: function() {
+                // Version
+                this.version.text(chrome.runtime.getManifest().version);
 
-                this._getImgData(function(data){
-                    $.each(data.imgList, function(){
-                        var li = '<li class="swiper-slide" data-no="' + this.no + 
-                            '" data-img="' + this.name + '"><img src="' + this.url + '" alt=""></li>';
-                        _this.swiper.appendSlide(li);
-                    });
-
-                });
-            },
-
-            _getImgData: function(cb){
-                var fullUrl = this._options.getImageList + '?uuid=' + this.uuid,
+                var fullUrl = this._options.getTestUrl,
                 xhr = new XMLHttpRequest(),
                 _this = this;
                 xhr.open('GET', fullUrl, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.timeout = 10000;
+                xhr.timeout = 2000;
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var res = JSON.parse(xhr.responseText);
-                        _this.imgList = res.imgList;
-                        cb(res);
+                        if("string" === typeof res.msg){
+                            _this.pwSwitch = true;
+                            if(_this.serverStatus.hasClass(_this._options.serverStatus.clPrefix + 'off')) _this.serverStatus.removeClass(_this._options.serverStatus.clPrefix + 'off');
+                            _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'on')
+                            _this.serverStatusTx.text('on');
+                        }else{
+                            _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'off');
+                            _this.serverStatusTx.text('on');
+                        }
+                    }else{
+                        _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'off');
+                        _this.serverStatusTx.text('on');
                     }
                 };
                 xhr.send();
@@ -157,9 +156,6 @@
             },
 
             _attachEvents: function() {
-                this.btn.on('click', $.proxy(this._onClickBtn, this));
-                this.downTempBtn.on('click', $.proxy(this._onClickTempBtn, this));
-                this.fileEle.on('change', $.proxy(this._onFileChange, this));
                 this.list.on('click', $.proxy(this._onListClick, this));
                 this.submitBtn.on('click', $.proxy(this._onSubmit, this));
             },
@@ -167,14 +163,15 @@
             _onListClick: function(e){
                 e.preventDefault();
                 var target = $(e.target)
-                , tr = target.parents('tr')
-                , url = tr.data('url');
+                , li = target.parents('li')
+                , url = li.data('url');
 
                 this.csvUrl = this.urls.val().split(',');
 
                 this.csvUrl.remove(url);
                 this.urls.val(this.csvUrl.join());
-                tr.remove();
+                this.numEle.text(this.csvUrl.length);
+                li.remove();
             },
 
             _timerEnable: function(){
@@ -215,16 +212,14 @@
             },
 
             _setDisplayByMode: function(){
-                this.eleStage2.show();
-
                 if(this.isTimer){
                     // 타이머 모드
                     this.timerDate = new Date(localStorage['timerDate']);
-                    this.eleStage4.show();
+                    this.eleStage2.show();
                     this._timerEnable();
                 }else{
                     // 일반 모드
-                    this.eleStage3.show();
+                    this.eleStage1.show();
                 }
             },
 
@@ -248,18 +243,26 @@
                         href = "http://"+href;
                     }
 
-                    var tr = $('<tr data-url="' + href + '"><td class="url"><a href="' + href + '" class="alink">' + href + '</a></td><td class="btn"><button class="removeBtn" type="button">-</button></td></tr>');
+                    var li = $('<li data-url="' + href + '"><button type="button" class="btn-circle btn-del">Delete url</button><span class="url">' + href + '</span><td class="url"></li>');
                     
-                    tr.appendTo(_this.list);
+                    li.appendTo(_this.list);
                 });
 
                 _this.urls.val(_this.csvUrl.join());
+                _this.numEle.text(result.data.length);
+
                 //일반, 타이머 모드별 디스플레이
                 _this._setDisplayByMode();
             },
 
             _timerSubmit: function() {
                 var _this = this;
+
+                if(_this.csvUrl.length < 1) {
+                    alert(chrome.i18n.getMessage('outOfCsvUrl'));
+                    window.close();
+                    return;
+                }
 
                 this.prefix = this.container.find(this._options.submit.prefix).val() ? this.container.find(this._options.submit.prefix).val() : 'HC';
                 _this.stNum = 0;
@@ -273,11 +276,17 @@
 
             _onSubmit: function(e) {
                 e.preventDefault;
+                
+                if(this.csvUrl.length < 1) {
+                    alert(chrome.i18n.getMessage('outOfCsvUrl'));
+                    window.close();
+                    return;
+                }
+
                 var _this = this;
 
                 this.prefix = this.container.find(this._options.submit.prefix).val() ? this.container.find(this._options.submit.prefix).val() : 'HC';
                 _this.stNum = 0;
-                // console.log(this.prefix);
 
 //              this.imageCont.show();
                 _this._getUuid(function(){
@@ -310,7 +319,12 @@
                     console.log(this.uuid, this.csvUrl.length, st)
                     var _this = this;
 
-                    var fullUrl = _this._options.getCapturedImg + '?url=' + _this.csvUrl[st] + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st + '&mode=' + _this.mode;
+                    var fullUrl = _this._options.getCapturedImg + '?url=' + encodeURIComponent(_this.csvUrl[st]) + '&uuid=' + _this.uuid + '&prefix=' + _this.prefix + '&order=' + st;
+                    if(_this.isMobile) {
+                        fullUrl += '&isMobile=' + _this.isMobile;
+                        if(_this.mobileWidth) fullUrl += '&mobileWidth=' + _this.mobileWidth;
+                    }
+                    
                     console.log(fullUrl);
                     _this.xhr[st] = new XMLHttpRequest();
                     _this.xhr[st].open('GET', fullUrl, true);
@@ -355,7 +369,6 @@
                     };
 
                     setTimeout(function(){
-                        // console.log(_this.xhr[st]);
                         _this.xhr[st].send();
                     }, 1000);
                     
