@@ -23,6 +23,9 @@
     "fileNotAttached": {
         "message":"CSV 파일을 첨부하지 않았습니다.\n다시 시도하여 주십시요."
     },
+    "timerTimeNotSet": {
+        "message":"Timer 캡처 발생 시간을 지정하지 않으셨습니다.\n다시 시도하여 주십시요."
+    },
     "outOfCsvUrl": {
         "message":"캡처 할 URL이 존재하지 않습니다.\n다시 시도하여 주십시요."
     },

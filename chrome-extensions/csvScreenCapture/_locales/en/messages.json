@@ -23,6 +23,9 @@
     "fileNotAttached": {
         "message":"Please attach a CSV file first before proceeding."
     },
+    "timerTimeNotSet": {
+        "message":"Please select your intended time before proceeding."
+    },
     "outOfCsvUrl": {
         "message":"Sorry, there is no URLs to capture.\nPlease try again."
     },

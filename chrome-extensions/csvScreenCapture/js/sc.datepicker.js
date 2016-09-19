@@ -1101,7 +1101,7 @@
   $.fn.datetimepicker.defaults = {
     maskInput: false,
     pickDate: true,
-    pickTime: true,
+    pickTime: false,
     pick12HourFormat: false,
     pickSeconds: true,
     startDate: -Infinity,

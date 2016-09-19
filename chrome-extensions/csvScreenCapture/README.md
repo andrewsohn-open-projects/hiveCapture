@@ -12,13 +12,15 @@ Requires
 
 Change Log
 =====
+ * `v 1.4.7`
+ 	 * [improved] UI improvement, Date/time-picker divided into inputs
+
  * `v 1.4.4` to `v 1.4.6`
 	 * [bug fix] infinite loading process when capturing 
 	 * [bug fix] zip file download button error
+	 * [bug fix] timer time validation
 	 * [improved] App UI renewed
 	 * [improved] Samsung.com User Preview Stage View provided
-
-
 
  * `v 1.4.3`
 	 * [new feature] Samsung.com User Process

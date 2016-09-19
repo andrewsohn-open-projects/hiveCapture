@@ -41,7 +41,8 @@
                         ele: '#screen-unit'
                     },
                     datepicker: {
-                        ele: '#datetimepicker',
+                        ele: '#datepicker',
+                        timeEle: '#timepicker',
                         inpt: 'input[type=text]',
                         dpBtn: '.add-on i',
                         timerBtn: 'input[name=isTimer]',
@@ -116,8 +117,10 @@
 
                 //datepicker
                 this.dp = this.container.find(this._options.datepicker.ele);
+                this.dpTime = this.container.find(this._options.datepicker.timeEle);
                 this.dpInpt = this.dp.find(this._options.datepicker.inpt);
                 this.dpBtn = this.dp.find(this._options.datepicker.dpBtn);
+                this.dpTimeBtn = this.dpTime.find(this._options.datepicker.dpBtn);
 
                 //timer button
                 this.timerBtn = this.container.find(this._options.datepicker.timerBtn);
@@ -132,17 +135,33 @@
                 prevDate.setDate(prevDate.getDate()-1);
 
                 this.dp.datetimepicker({
-                    format: 'dd/MM/yyyy hh:mm:ss',
+                    format: 'dd/MM/yyyy',
                     language: 'kr',
                     startDate: prevDate,
                     init: function(dp){
-                        _this.datetimepicker = dp;
+                        _this.datepicker = dp;
                     }
                 })
                     .on('changeDate', $.proxy(this.datePickerChange, this));
 
-                if('undefined' !== typeof this.datetimepicker) this.datetimepicker.disable();
+                this.dpTime.datetimepicker({
+                    format: ' hh:mm:ss',
+                    pickDate: false,
+                    pickTime: true,
+                    language: 'kr',
+                    startDate: prevDate,
+                    init: function(dp){
+                        _this.timepicker = dp;
+                    }
+                })
+                    .on('changeDate', $.proxy(this.timePickerChange, this));
+
+                if('undefined' !== typeof this.datepicker) this.datepicker.disable();
+                if('undefined' !== typeof this.timepicker) this.timepicker.disable();
                 this.dpBtn.css({'cursor':'not-allowed'});
+                this.dpTimeBtn.css({'cursor':'not-allowed'});
+
+                $('#timepicker1').timepicki();
 
                 this.xhr = [];
                 this.isMobile = false;
@@ -164,8 +183,15 @@
 
             datePickerChange: function(e){
                 this.timerDate = e.localDate;
-                // console.log(e.currentTarget);
-                // $(e.currentTarget).datetimepicker('hide');
+                $(e.currentTarget).datetimepicker('hide');
+                this.timepicker.component.trigger('click');
+                // .datetimepicker('show');
+            },
+
+            timePickerChange: function(e){
+                this.timerDate.setHours(e.localDate.getHours())
+                this.timerDate.setMinutes(e.localDate.getMinutes())
+                this.timerDate.setSeconds(e.localDate.getSeconds());
             },
 
             _onClickTempBtn: function(e){
@@ -278,7 +304,14 @@
                 // 타이머 모드 설정
                 if(_this.timerBtn.is(':checked')){
                     localStorage['isTimer'] = 1;
-                    if('undefined' !== typeof _this.timerDate) localStorage['timerDate'] = _this.timerDate;
+
+                    if('undefined' === typeof _this.timerDate){
+                        alert(chrome.i18n.getMessage('timerTimeNotSet'));
+                        this.dpBtn.trigger('click');
+                        return false;
+                    }
+
+                    localStorage['timerDate'] = _this.timerDate;
                 }
 
                 chrome.windows.create({
@@ -296,7 +329,9 @@
                     //enable input 
                     this.isTimer = true;
                     this.dpBtn.css({'cursor':'pointer'});
-                    this.datetimepicker.enable();
+                    this.dpTimeBtn.css({'cursor':'pointer'});
+                    this.datepicker.enable();
+                    this.timepicker.enable();
 
                     if(!li.hasClass(this._options.cl_check)) li.addClass(this._options.cl_check);
                 }else{
@@ -306,7 +341,10 @@
 
                     this.isTimer = false;
                     this.dpBtn.css({'cursor':'not-allowed'});
-                    this.datetimepicker.disable();
+                    this.dpTimeBtn.css({'cursor':'not-allowed'});
+                    this.datepicker.disable();
+                    this.timepicker.disable();
+
                     if(li.hasClass(this._options.cl_check)) li.removeClass(this._options.cl_check);
                 }
             },
