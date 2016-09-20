@@ -132,7 +132,7 @@
 
                 this.mobileOpt.prop('readonly', true);
 
-                prevDate.setDate(prevDate.getDate()-1);
+                prevDate.setDate(prevDate.getDate());
 
                 this.dp.datetimepicker({
                     format: 'dd/MM/yyyy',
@@ -160,8 +160,6 @@
                 if('undefined' !== typeof this.timepicker) this.timepicker.disable();
                 this.dpBtn.css({'cursor':'not-allowed'});
                 this.dpTimeBtn.css({'cursor':'not-allowed'});
-
-                $('#timepicker1').timepicki();
 
                 this.xhr = [];
                 this.isMobile = false;

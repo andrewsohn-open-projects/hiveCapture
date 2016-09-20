@@ -88,7 +88,7 @@ router.get('/capture', function (req, res) {
 	}
 
 	// Set image name
-	var url = req.query.url;
+	var url = decodeURIComponent(req.query.url);
 	
 	var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
 	var commentsTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
@@ -98,19 +98,20 @@ router.get('/capture', function (req, res) {
 	});
 
 	url = url.replace(';', '').replace('"', '').replace('\'', '/').replace('<?', '')
-	.replace('<?', '').replace('\077', ' ');
+	.replace('<?', '').replace(/(\r\n|\n|\r)/gm,"");
+	// .replace('\077', ' ');
 	
-// 		$img_name = random_string('alnum', 16);
-	var domain_name = url;
+	var url_wo_param = (url.indexOf("?") != -1)? url.split("?")[0]:url;
+	var domain_name = url_wo_param;
 	var disallowed = ['http://', 'https://'];
 
 	for (var d in disallowed) {
-		if(url.indexOf(disallowed[d]) === 0) {
-			 domain_name = url.replace(disallowed[d], '');
+		if(url_wo_param.indexOf(disallowed[d]) === 0) {
+			 domain_name = url_wo_param.replace(disallowed[d], '');
 		}
 	}
-	
-	domain_name = domain_name.replace(/\//gi, '_');
+
+	domain_name = domain_name.replace(/\//gi, '_').trim();
 
 	var img_name = req.query.prefix + '_' + req.query.order + '_' + domain_name + '.' + config.phantom.ext;
 	var filePath = dirPath + '/' + img_name;
@@ -358,8 +359,18 @@ router.get('/capture', function (req, res) {
 					    	if(isSsPreview){
 					    		page.property('viewportSize', { width: mobileWidth, height: options.windowSize.height });
 					    		page.property('clipRect', { top: 0, left: 0, width: mobileWidth, height: options.windowSize.height });
-					    	
-					    		page.addCookie(config.phantom.ssCookieInfo);
+
+					    		var ssCookieInfo;
+					    		if(req.query.ssCookieValue){
+					    			ssCookieInfo = {
+							            "name"     : req.query.ssCookieName,
+							            "value"    : req.query.ssCookieValue,
+							            "domain"   : "samsung.com"
+							        }
+					    		}else{
+					    			ssCookieInfo = config.phantom.ssCookieInfo;
+					    		}
+					    		page.addCookie(ssCookieInfo);
 					    	}
 					    	
 					    	page.open(url);
@@ -426,7 +437,17 @@ router.get('/capture', function (req, res) {
 					    		page.property('viewportSize', { width: pc_w, height: options.windowSize.height });
 					    		page.property('clipRect', { top: 0, left: 0, width: pc_w, height: options.windowSize.height });
 					    	
-					    		page.addCookie(config.phantom.ssCookieInfo);
+					    		var ssCookieInfo;
+					    		if(req.query.ssCookieValue){
+					    			ssCookieInfo = {
+							            "name"     : req.query.ssCookieName,
+							            "value"    : req.query.ssCookieValue,
+							            "domain"   : "samsung.com"
+							        }
+					    		}else{
+					    			ssCookieInfo = config.phantom.ssCookieInfo;
+					    		}
+					    		page.addCookie(ssCookieInfo);
 					    	}
 
 					        page.open(url);
@@ -616,7 +637,17 @@ router.get('/capture', function (req, res) {
 		    	page.property('clipRect', { top: 0, left: 0, width: 1281, height: options.windowSize.height });
 
 		    	if(isSsPreview){
-		    		page.addCookie(config.phantom.ssCookieInfo);
+		    		var ssCookieInfo;
+		    		if(req.query.ssCookieValue){
+		    			ssCookieInfo = {
+				            "name"     : req.query.ssCookieName,
+				            "value"    : req.query.ssCookieValue,
+				            "domain"   : "samsung.com"
+				        }
+		    		}else{
+		    			ssCookieInfo = config.phantom.ssCookieInfo;
+		    		}
+		    		page.addCookie(ssCookieInfo);
 		    	}
 		    	
 		        page.open(url);

@@ -325,6 +325,10 @@
                         if(_this.mobileWidth) fullUrl += '&mobileWidth=' + _this.mobileWidth;
                     }
                     
+                    chrome.cookies.get({"url": "http://preview4.samsung.com", "name": "IW_AUTHENTICATION.P4" }, function(cookie) {
+                        if("undefined" !== typeof cookie && "undefined" !== typeof cookie.value) fullUrl += '&ssCookieName=IW_AUTHENTICATION.P4&ssCookieValue=' + cookie.value;
+                    });
+
                     console.log(fullUrl);
                     _this.xhr[st] = new XMLHttpRequest();
                     _this.xhr[st].open('GET', fullUrl, true);

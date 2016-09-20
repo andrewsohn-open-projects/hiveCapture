@@ -17,10 +17,12 @@
         "default_popup": "index.html"
     },
     "permissions": [
+        "cookies",
         "tabs",
         "downloads",
         "storage",
         "<all_urls>",
-        "http://uxd.hivelab.co.kr:1337/*"
+        "http://uxd.hivelab.co.kr:1337/*",
+        "*://*.samsung.com/*"
     ]
 }
