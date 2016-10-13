@@ -1,0 +1,20 @@
+{
+  "name": "__MSG_name__",
+  "description": "__MSG_description__",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "default_locale":"en",
+  "icons": {
+    "16": "./img/icon.png",
+    "128": "./img/icon.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["./js/sc.background.js"]
+    }
+  },
+  "permissions": [
+    "desktopCapture",
+    "storage"
+  ]
+}

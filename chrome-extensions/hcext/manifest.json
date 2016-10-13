@@ -24,7 +24,8 @@
         "storage",
         "<all_urls>",
         "http://uxd.hivelab.co.kr:1337/*",
-        "*://*.samsung.com/*"
+        "*://*.samsung.com/*",
+        "management"
     ],
     "offline_enabled": true
 }

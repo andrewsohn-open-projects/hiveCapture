@@ -13105,7 +13105,8 @@ sc.ui.config = {
         arrows: false
     },
     api_url: 'http://uxd.hivelab.co.kr:1337',
-    file_prefix: 'HC'
+    file_prefix: 'HC',
+    app_id: 'pklddmifaddkcgaaihjbpponfjcjable'
 };
 
 sc.ui.Util = {

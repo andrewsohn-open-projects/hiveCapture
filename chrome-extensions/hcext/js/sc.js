@@ -298,6 +298,10 @@
                 }
 
                 // Extra Setting Values
+                
+                chrome.storage.sync.set({'csvUrl':_this.csvUrls}, function() {
+                    console.log('CSV Saved');
+                });
                 localStorage.clear();
                 localStorage['csvUrl'] = _this.csvUrls;
                 localStorage['isMobile'] = 0;
@@ -322,10 +326,13 @@
                     localStorage['timerDate'] = _this.timerDate;
                 }
 
-                chrome.windows.create({
-                    'url': _this.url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
-                }, function(win){
-                   window.close(); 
+                // chrome.windows.create({
+                //     'url': _this.url, 'type': 'popup', 'width': _util.winWidth() + 35, 'height': _util.winHeight() + 40
+                // }, function(win){
+                //    window.close(); 
+                // });
+                chrome.management.launchApp(_config.app_id, function(){
+                    console.log('opened!');
                 });
             },
 
