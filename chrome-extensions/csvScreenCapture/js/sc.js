@@ -51,6 +51,10 @@
                     options: {
                         cont: '.set-option'
                     },
+                    serverStatus : {
+                        ele: '.server-status',
+                        clPrefix: 'st-'
+                    },
                     stage: {
                         stage1: '.js-stage-1',
                         stage1Btns: '.btns a',
@@ -62,7 +66,8 @@
                     cl_check: "selected",
                     csvTemplateUrl: _config.api_url + '/data/HC_URL_List_Template.csv',
                     mWidthValue: '360',
-                    actionUrl: './extract.html'
+                    actionUrl: './extract.html',
+                    getTestUrl: _config.api_url
                 };
 
                 this._options = $.extend(true, this._defaults, options);
@@ -71,6 +76,7 @@
                 this._assignedHTMLElements();
                 this._setAppVersion();
                 this._initProperties();
+                this._serverCheck();
                 this._attachEvents();
             },
 
@@ -124,6 +130,10 @@
 
                 //timer button
                 this.timerBtn = this.container.find(this._options.datepicker.timerBtn);
+
+                //server status
+                this.serverStatus = this.container.find(this._options.serverStatus.ele);
+                this.serverStatusTx = this.serverStatus.find('em');
             },
 
             _initProperties: function() {
@@ -358,6 +368,36 @@
                     if(this.mobileOpt.val().length) this.mobileOpt.val(this._options.mWidthValue);
                     if(li.hasClass(this._options.cl_check)) li.removeClass(this._options.cl_check);
                 }
+            },
+
+            _serverCheck: function() {
+                // Version
+                this.version.text(chrome.runtime.getManifest().version);
+
+                var fullUrl = this._options.getTestUrl,
+                xhr = new XMLHttpRequest(),
+                _this = this;
+                xhr.open('GET', fullUrl, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.timeout = 2000;
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var res = JSON.parse(xhr.responseText);
+                        if("string" === typeof res.msg){
+                            _this.pwSwitch = true;
+                            if(_this.serverStatus.hasClass(_this._options.serverStatus.clPrefix + 'off')) _this.serverStatus.removeClass(_this._options.serverStatus.clPrefix + 'off');
+                            _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'on')
+                            _this.serverStatusTx.text('on');
+                        }else{
+                            _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'off');
+                            _this.serverStatusTx.text('on');
+                        }
+                    }else{
+                        _this.serverStatus.addClass(_this._options.serverStatus.clPrefix + 'off');
+                        _this.serverStatusTx.text('on');
+                    }
+                };
+                xhr.send();
             }
         };
     })();

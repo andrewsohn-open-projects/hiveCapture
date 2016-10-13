@@ -86,6 +86,7 @@
                 this.pwSwitch = false;
                 this.isTimer = (parseInt(localStorage['isTimer'], 10) === 1)? true:false;
                 this.isMobile = localStorage['isMobile'];
+                if('undefined' !== typeof localStorage['mobileWidth']) this.mobileWidth = localStorage['mobileWidth'];
                 this.csvUrl = localStorage['csvUrl'].split(',');
             },
 

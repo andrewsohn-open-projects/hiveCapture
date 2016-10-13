@@ -13,7 +13,10 @@ Requires
 Change Log
 =====
  * `v 1.4.7`
- 	 * [improved] UI improvement, Date/time-picker divided into inputs
+ 	 * [improved] UI improvement:
+ 	 	* Date/time-picker divided into inputs
+ 	 	* Server status signal on the initial page
+
 
  * `v 1.4.4` to `v 1.4.6`
 	 * [bug fix] infinite loading process when capturing 

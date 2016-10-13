@@ -8,7 +8,8 @@
           "matches": [
             "<all_urls>"
           ],
-          "js": ["./js/sc.common.js", "./js/sc.datepicker.js", "./js/sc.js"]
+          "js": ["./js/sc.common.js", "./js/sc.datepicker.js", "./js/sc.js"],
+          "run_at": "document_start"
         }
     ],
     "default_locale":"en",
@@ -24,5 +25,6 @@
         "<all_urls>",
         "http://uxd.hivelab.co.kr:1337/*",
         "*://*.samsung.com/*"
-    ]
+    ],
+    "offline_enabled": true
 }
