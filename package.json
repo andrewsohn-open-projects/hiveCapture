@@ -1,0 +1,53 @@
+{
+  "name": "hivecapture",
+  "version": "1.0.0",
+  "productName": "hivecapture",
+  "description": "HiveCapture :: CSV File Screen Capture App",
+  "main": "libs/app.js",
+  "scripts": {
+    "start": "electron .",
+    "publish": "electron-packager . hivecapture --out=dist/apps --platform=win32 --arch=x64 app-version=1.0 --icon=img/icons/hivecapture_256x256.ico --overwrite",
+    "dist:win64": "./node_modules/.bin/build --platform win32 --arch x64"
+  },
+  "author": "HiveLab Inc",
+  "iconUrl": "http://uxd.hivelab.co.kr/users/sohn/hivecapture_256x256.ico",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.4.1",
+    "electron-winstaller": "^2.3.4",
+    "electron-builder": "^7.14.2"
+  },
+  "dependencies": {
+    "async": "^2.1.2",
+    "electron-json-storage": "^2.0.1",
+    "jquery": "^3.1.1",
+    "underscore": "^1.8.3"
+  },
+  "build": {
+    "app-bundle-id": "org.test.mytest",
+    "app-category-type": "public.app-category.graphics-design",
+    "osx": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "title": "My awesome app",
+      "version": "2.28.999.1",
+      "iconUrl": "http://uxd.hivelab.co.kr/users/sohn/hivecapture_256x256.ico",
+      "icon": "img/icons/hivecapture_256x256.ico",
+      "msi": true,
+      "authors": "HiveLab Inc"
+    }
+  }
+}

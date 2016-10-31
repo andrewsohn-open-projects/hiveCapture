@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>HiveCapture</title>
+    <link rel="stylesheet" href="../css/hivecapture.css" />
+    <link rel="stylesheet" href="../css/jquery.enhsplitter.css" />
+    <style>
+
+        .splitter_panel > div {
+            padding: 0 1em;
+        }
+
+        #demoOne {
+            /*background-color: #e7e3ff;*/
+            /*width: 50%;
+            height: 375px;*/
+            border: 4px solid #666;
+        }
+
+        #demoTwoA {
+            /*background-color: #efbd73;*/
+        }
+
+        #demoTwoB {
+            /*background-color: #ef9e92;*/
+        }
+    </style>
+  </head>
+  <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
+    <div class="wrap" data-role="page" data-theme="a">
+
+      <header class="ui-header" data-role="header" data-position="inline">
+        <!-- <h1>Hive Capture <span class="server-status"><em></em></span></h1>
+        <p class="version js-app-version"></p> -->
+      </header>
+
+      <div class="content">
+        <div id="demoOne" class="js-cont-layout">
+          <div class="js-cont-layoutA">
+            <section>
+
+              <h2 class="gwt-Label FR">캡처 설정</h2>
+              <br/>
+              기기 : 
+              <select>
+                <option value="pc">PC</option>
+                <option value="m">모바일</option>
+                <option value="othr">그외</option>
+              </select>
+              <br/><br/>
+              해상도 : <input type="text" name=""/> x <input type="text" name=""/><br/><br/>
+              옵션: <a href="http://www.samsung.com/sg/">http://www.samsung.com/sg/</a>
+              <input type="checkbox" id="op_lazy" name="chk2"><label for="op_lazy">레이지 로딩</label>  
+              <input type="checkbox" id="test" name="chk2"><label for="test">테스트</label>  
+              <input type="checkbox" id="test2" name="chk2"><label for="test2">테스트2</label><br/><br/>
+              
+              test3: <input type="text" name=""/><br/><br/>
+              <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
+              
+            </section>
+          </div>
+          <div class="js-cont-layoutB">
+              <div id="demoTwoA js-csvListCont">
+                <h3>URL List <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h3>
+                <ul class="js-csvList">
+                  <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
+                </ul>
+              </div>
+              <div id="demoTwoB">
+                <webview id="webView" src="" style="display:inline-flex; width:100%; height:98%"></webview>
+              </div>
+          </div>
+        </div>
+
+  <!-- 
+    <section class="set-option">
+      <ul>
+      <li class="set-mscreen">
+        <input type="checkbox" id="check-mscreen">
+        <label for="check-mscreen">Width mobile screen</label>
+        <input type="text" id="screen-unit" class="inp-basic" value="360"/>
+        <label for="screen-unit">px</label>
+      </li>
+      <li class="set-timer">
+        <input type="checkbox" name="isTimer" id="check-timer">
+        <label for="check-timer">Set Timer</label>
+
+        <div class="input-append date" id="datepicker" style="text-align:right;">
+            <input type="text" class="inp-basic" readonly />
+          <span class="add-on">
+          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+          </span>
+        </div>
+
+        <div class="input-append date" id="timepicker" style="text-align:right;">
+            <input type="text" class="inp-basic" readonly />
+          <span class="add-on">
+          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+          </span>
+        </div>
+      </li>
+      </ul>
+    </section>
+     -->
+    
+    <!-- <section class="lst-files js-csvListCont">
+      <h3>URL List <span class="num">(<strong class="js-listCount"></strong>)</span></h3>
+      <ul class="js-csvList">
+      </ul>
+    </section> -->
+    <!-- 
+    <section class="btn-cvs">
+      <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
+      <button type="button" id="csvDnldBtn" class="btn-basic">CSV 템플릿 다운로드</button>
+    </section>
+     -->
+  </div>
+
+  <div class="dimmed" style="display: none;"></div>
+      <input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
+
+  <section class="content-foot">
+      <button type="submit" class="btn-basic js-submit-btn">일괄 캡처</button>
+    </section>
+  <footer>
+    
+    <div class="logo">HiveCapture by <img src="../img/logo-hivelab.png" alt="hivelab"></div>
+  </footer>
+</div>
+    <!-- 
+    * This file is part of the HiveCapture Chrome App.
+    *
+    * https://github.com/hivelab-open-projects/hiveCapture
+    * 
+    * Copyright 2016, Andrew Sohn
+    * hivelab Co., Ltd
+    * http://www.hivelab.co.kr/
+    * 
+    * Licensed under MIT
+    * 
+    * Released on: October 7, 2016
+    -->
+
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <!-- We are using node <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>. -->
+  </body>
+  <script>
+    // You can also require other files to run in this process
+    window.$ = window.jQuery = require('jquery');
+    require('../libs/vender/jquery.enhsplitter');
+    require('../libs/renderer.js');
+  </script>
+  
+</html>

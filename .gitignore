@@ -1,4 +1,4 @@
-/api/.htaccess
+/dist
 /chrome-extensions/csvScreenCapture.zip
-/api/node_modules
+/node_modules
 /api/public/upload/*
