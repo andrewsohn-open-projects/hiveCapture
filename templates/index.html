@@ -18,14 +18,6 @@
             height: 375px;*/
             border: 4px solid #666;
         }
-
-        #demoTwoA {
-            /*background-color: #efbd73;*/
-        }
-
-        #demoTwoB {
-            /*background-color: #ef9e92;*/
-        }
     </style>
   </head>
   <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
@@ -62,18 +54,18 @@
             </section>
           </div>
           <div class="js-cont-layoutB">
-              <div id="demoTwoA js-csvListCont">
+              <div class="js-csvListCont">
                 <h3>URL List <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h3>
                 <ul class="js-csvList">
                   <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
                 </ul>
               </div>
-              <div id="demoTwoB">
-                <webview id="webView" src="" style="display:inline-flex; width:100%; height:98%"></webview>
+              <div class="js-webCont">
+                
               </div>
           </div>
         </div>
-
+<!-- <canvas id="c" style="display:none;" width="300" height="300"></canvas> -->
   <!-- 
     <section class="set-option">
       <ul>
@@ -154,5 +146,4 @@
     require('../libs/vender/jquery.enhsplitter');
     require('../libs/renderer.js');
   </script>
-  
 </html>

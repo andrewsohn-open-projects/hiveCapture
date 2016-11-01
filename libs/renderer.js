@@ -5,6 +5,8 @@ async = require('async'),
 _ = require('underscore'),
 messages = require('./message.js');
 
+const {BrowserWindow} = require('electron').remote
+
 ;(function(win, $, ipc){
 	'use strict';
 
@@ -47,6 +49,7 @@ messages = require('./message.js');
 				contLayout:'.js-cont-layout',
 				layoutA:'.js-cont-layoutA',
 				layoutB:'.js-cont-layoutB',
+				layoutWebView:'.js-webCont',
 				csvEle:'input[name=csv]',
 				urlCount:'.js-listCount'
 			};
@@ -82,8 +85,9 @@ messages = require('./message.js');
 			this.$urlCount = this.$contLayoutB.find(this.options.urlCount);
 			this.$urlDelAll = this.$contLayoutB.find(this.options.urlDelAllBtn);
 			
-			// web view element
-			this.$webview = this.$contLayoutB.find(this.options.webViewId);
+			// web view container
+			this.$WebViewCont = this.$contLayoutB.find(this.options.layoutWebView);
+			// this.$webview = this.$contLayoutB.find(this.options.webViewId);
 
 
 			this.$fileEle = this.body.find(this.options.csvEle);
@@ -115,7 +119,8 @@ messages = require('./message.js');
 
 		visualizeWebView(){
 			var initUrl = (win.hc.csvUrlData.length > 0 && 'undefined' !== win.hc.csvUrlData[0])? win.hc.csvUrlData[0]:"http://www.hivelab.co.kr/";
-			this.$webview.attr('src', initUrl);
+			var webview = this.$WebViewCont.find('webview');
+			console.log(webview)
 		}
 
 		onClickBtn(e) {
@@ -248,22 +253,84 @@ messages = require('./message.js');
 			_this.visualizeWebView();
         }
 
+        takeScreenShot (callback) {
+		    let screenConstraints = {
+		        mandatory: {
+		            chromeMediaSource: "screen",
+		            maxHeight: 1080,
+		            maxWidth: 1920,
+		            minAspectRatio: 1.77
+		        },
+		        optional: []
+		    };
+
+		    let session = {
+		        audio: false,
+		        video: screenConstraints
+		    };
+
+		    let streaming = false;
+		    let canvas = document.createElement("canvas");
+		    let video = document.createElement("video");
+		    document.body.appendChild(canvas);
+		    document.body.appendChild(video);
+		    let width = screen.width;
+		    let height = 0;
+
+		    video.addEventListener("canplay", function(){
+		        if (!streaming) {
+		            height = video.videoHeight / (video.videoWidth / width);
+
+		            if (isNaN(height)) {
+		                height = width / (4 / 3);
+		            }
+
+		            video.setAttribute("width", width.toString());
+		            video.setAttribute("height", height.toString());
+		            canvas.setAttribute("width", width.toString());
+		            canvas.setAttribute("height", height.toString());
+		            streaming = true;
+
+		            let context = canvas.getContext("2d");
+		            if (width && height) {
+		                canvas.width = width;
+		                canvas.height = height;
+		                context.drawImage(video, 0, 0, width, height);
+
+		                canvas["toBlob"](function (data) {
+		                    video.pause();
+		                    video.src = "";
+		                    document.body.removeChild(video);
+		                    document.body.removeChild(canvas);
+		                    callback(data);
+		                });
+		            }
+		        }
+		    }, false);
+
+		    navigator["webkitGetUserMedia"](session, function (stream) {
+		        video.src = window["webkitURL"].createObjectURL(stream);
+		        video.play();
+		    }, function () {
+		        console.error("Can't take a screenshot");
+		    });
+		}
+
 		onClickSubmitBtn(e){
 			e.preventDefault();
 
-			console.log(win.hc.csvUrlData);
+			let newWin = new BrowserWindow({width: 800, height: 600})
+			let temp = "file://"+config.srcPath+"/../templates/capture.html";
 
+			let captureData = {
+				"url":"http://www.samsung.com/br/home/"
+			};
 
-			
-			// this.$webview[0].addEventListener('did-finish-load', () => {
-			//   this.$webview[0].capturePage({x:0, y:0, width:1000, height:1000},function(image){
-			// 		var buf = image.toPng();
+			newWin.loadURL(temp)
+			newWin.webContents.on('did-finish-load', () => {
+			    newWin.webContents.send('captureInfo', captureData)
+			  })
 
-			//         fs.writeFile('s.png', buf, function(err) {
-			//           console.log(err);
-			//         });
-			// 	});
-			// });
 		}
 
 		onClickUrlList(e){
@@ -274,13 +341,8 @@ messages = require('./message.js');
 
 			if($trg.hasClass(this.options.urlBtnClass)){
 
-				var options = {
-					httpReferrer:'',
-					userAgent:'',
-					extraHeaders:''
-				};
-
-				this.$webview[0].loadURL($trg.attr('href'), options);
+				var webview = this.$WebViewCont.find('webview');
+				webview[0].loadURL($trg.attr('href'), win.hc.webViewOpt);
 
 			}else if($trg.hasClass(this.options.urlDeleteBtnClass)){
 				var delUrl = $trg.next('a').eq(0).attr('href'),
@@ -377,7 +439,11 @@ messages = require('./message.js');
 
 			// first URL displaying webview
 			var initUrl = (newDataArr.length > 0 && 'undefined' !== newDataArr[0])? newDataArr[0]:"http://www.hivelab.co.kr/";
-			$('#webView').attr('src', initUrl);
+			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" preload="../libs/inject.js" plugins style="display:inline-flex; width:100%; height:98%"></webview>');
+
+			document.getElementById('webView').addEventListener('console-message', function(e) {
+		        console.log(e.message);
+		      });
 		});
 
 	})

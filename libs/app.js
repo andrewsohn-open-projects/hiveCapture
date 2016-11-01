@@ -8,8 +8,6 @@ const config = require('./config');
 
 const winMenu = require('./layout/win-menu');
 
-
-
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -29,6 +27,7 @@ function createWindow () {
 
   //Send Data
   mainWindow.webContents.on('did-finish-load', () => {
+    config.srcPath = `${__dirname}`
     mainWindow.webContents.send('info', config)
   })
 
