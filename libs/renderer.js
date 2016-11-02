@@ -320,16 +320,29 @@ const {BrowserWindow} = require('electron').remote
 			e.preventDefault();
 
 			let newWin = new BrowserWindow({width: 800, height: 600})
-			let temp = "file://"+config.srcPath+"/../templates/capture.html";
+			let captureTemplate = "file://"+config.srcPath+"/../templates/capture.html";
 
 			let captureData = {
+				"parentId": config.mainId,
+				"captureId": newWin.id,
 				"url":"http://www.samsung.com/br/home/"
 			};
 
-			newWin.loadURL(temp)
+			newWin.loadURL(captureTemplate)
 			newWin.webContents.on('did-finish-load', () => {
-			    newWin.webContents.send('captureInfo', captureData)
-			  })
+				newWin.webContents.send('captureInfo', captureData)
+			})
+			// ipc.on('setPosition', (event, arg) => {
+			//   console.log(arg)  // prints "ping"
+			  
+			// })
+			// let captureWin = BrowserWindow.fromId(config.subId);
+			// captureWin.loadURL(captureTemplate)
+			// captureWin.webContents.on('did-finish-load', () => {
+			//     captureWin.webContents.send('captureInfo', captureData)
+			//   })
+		// myWindow.webContents.send('an-event-from-window-zero');
+  //   	ipc.send('setPosition', 'ping');
 
 		}
 

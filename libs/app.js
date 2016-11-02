@@ -10,15 +10,13 @@ const winMenu = require('./layout/win-menu');
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+// const ipcMain = electron.ipcMain
 let mainWindow;
 
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1200, height: 750})
-
+  
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/../templates/index.html`)
 
@@ -28,8 +26,11 @@ function createWindow () {
   //Send Data
   mainWindow.webContents.on('did-finish-load', () => {
     config.srcPath = `${__dirname}`
+    config.mainId = mainWindow.id
     mainWindow.webContents.send('info', config)
   })
+
+  // ipcMain.on('ipc', (event, arg)=> console.log(arg));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
