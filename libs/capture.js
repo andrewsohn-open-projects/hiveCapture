@@ -125,7 +125,7 @@ const {app, BrowserWindow, clipboard} = electron.remote
 		// 	    function(callback) {
 		// 	        count++;
 		$('body').find('webview').on('dom-ready', () => {
-        	$('body').find('webview')[0].openDevTools();
+        	// $('body').find('webview')[0].openDevTools();
         	$('body').find('webview')[0].send('winConfig', win.config)
 		});
 	})
