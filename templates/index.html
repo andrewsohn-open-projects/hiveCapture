@@ -42,13 +42,14 @@
                 <option value="othr">그외</option>
               </select>
               <br/><br/>
-              해상도 : <input type="text" name=""/> x <input type="text" name=""/><br/><br/>
-              옵션: <a href="http://www.samsung.com/sg/">http://www.samsung.com/sg/</a>
+              해상도 : <input type="text" name="dimenW" placeholder="1280"/> x <input type="text" name="dimenH" placeholder="768"/><input type="checkbox" id="op_noVert" name="noVert"><label for="op_noVert">세로값 무시</label><br/><br/>
+              옵션: 
               <input type="checkbox" id="op_lazy" name="chk2"><label for="op_lazy">레이지 로딩</label>  
               <input type="checkbox" id="test" name="chk2"><label for="test">테스트</label>  
               <input type="checkbox" id="test2" name="chk2"><label for="test2">테스트2</label><br/><br/>
               
-              test3: <input type="text" name=""/><br/><br/>
+              File Prefix: <input type="text" name="prefix" autocomplete="on" placeholder="HC" /><br/><br/>
+              Zip File Name: <input type="text" name="zipName" autocomplete="on" placeholder="HC_{date}"/><br/><br/>
               <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
               
             </section>

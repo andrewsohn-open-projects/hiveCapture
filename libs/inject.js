@@ -46,7 +46,6 @@ window.addEventListener('load', ()=> {
         
         
     });
-    
 });
 
 function scrollBottom(element, destH, frameH, duration, callback) {
@@ -159,21 +158,16 @@ function snap(num, posY, isLast, leftOverLength, callback){
             var imgData = canvas.toDataURL();
             var data = imgData.replace(/^data:image\/\w+;base64,/, "");
             var buf = new Buffer(data, 'base64');
+            var dest = winConfig.destFolder + "/"+winConfig.filename;
 
-            var folder = app.getPath('desktop') + "/HC-IMG-";
+            fs.writeFile(dest, buf, function(err) {
+              if(err) console.log(err);
 
-            fs.mkdtemp(folder, (err, folder) => {
-                if (err) throw err;
-                winConfig.destFolder = folder;
-                var dest = folder + "/s"+num+".png";
-
-                fs.writeFile(dest, buf, function(err) {
-                  if(err) console.log(err);
-                });
+              // 윈도우 창 닫으면서 win.destFolder 값을 보내야함
+              thisWin.close()
             });
-        }
 
-        // 윈도우 창 닫으면서 win.destFolder 값을 보내야함
+        }
     });
 }
 

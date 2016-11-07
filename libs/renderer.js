@@ -2,10 +2,13 @@ const electron = require('electron'),
 storage = require('electron-json-storage'),
 fs = require('fs'),
 async = require('async'),
+path = require('path'),
 _ = require('underscore'),
+zipdir = require('zip-dir'),
+rmdir = require('rmdir'),
 messages = require('./message.js');
 
-const {BrowserWindow} = require('electron').remote
+const {app, BrowserWindow} = require('electron').remote
 
 ;(function(win, $, ipc){
 	'use strict';
@@ -51,6 +54,11 @@ const {BrowserWindow} = require('electron').remote
 				layoutB:'.js-cont-layoutB',
 				layoutWebView:'.js-webCont',
 				csvEle:'input[name=csv]',
+				prefixEle:'input[name=prefix]',
+				zipNameEle:'input[name=zipName]',
+				dimenWEle:'input[name=dimenW]',
+				dimenHEle:'input[name=dimenH]',
+				noHeightEle:'input[name=noVert]',
 				urlCount:'.js-listCount'
 			};
 		}
@@ -78,6 +86,11 @@ const {BrowserWindow} = require('electron').remote
 			//Layout A
 			this.$contLayoutA = this.$contLayout.find(this.options.layoutA);
 			this.$csvUploadBtn = this.$contLayoutA.find(this.options.csvUploadBtn);
+			this.$prefixEle = this.$contLayoutA.find(this.options.prefixEle);
+			this.$zipNameEle = this.$contLayoutA.find(this.options.zipNameEle);
+			this.$dimenWEle = this.$contLayoutA.find(this.options.dimenWEle);
+			this.$dimenHEle = this.$contLayoutA.find(this.options.dimenHEle);
+			this.$noHeightEle = this.$contLayoutA.find(this.options.noHeightEle);
 
 			//Layout B
 			this.$contLayoutB = this.$contLayout.find(this.options.layoutB);
@@ -88,7 +101,6 @@ const {BrowserWindow} = require('electron').remote
 			// web view container
 			this.$WebViewCont = this.$contLayoutB.find(this.options.layoutWebView);
 			// this.$webview = this.$contLayoutB.find(this.options.webViewId);
-
 
 			this.$fileEle = this.body.find(this.options.csvEle);
 			this.$submitBtn = this.body.find(this.options.submitBtnClass);
@@ -253,97 +265,132 @@ const {BrowserWindow} = require('electron').remote
 			_this.visualizeWebView();
         }
 
-        takeScreenShot (callback) {
-		    let screenConstraints = {
-		        mandatory: {
-		            chromeMediaSource: "screen",
-		            maxHeight: 1080,
-		            maxWidth: 1920,
-		            minAspectRatio: 1.77
-		        },
-		        optional: []
-		    };
+		zipToDest(){
+			var nowDate = new Date();
+			var month = nowDate.getMonth()+1;
+			var day = nowDate.getDate();
+			var year = nowDate.getFullYear();
 
-		    let session = {
-		        audio: false,
-		        video: screenConstraints
-		    };
+			if (month   < 10) {month   = "0"+month;}
+			if (day < 10) {day = "0"+day;}
 
-		    let streaming = false;
-		    let canvas = document.createElement("canvas");
-		    let video = document.createElement("video");
-		    document.body.appendChild(canvas);
-		    document.body.appendChild(video);
-		    let width = screen.width;
-		    let height = 0;
+			var def_zip = "HC_" + year + '-' + month + '-' + day + ".zip";
 
-		    video.addEventListener("canplay", function(){
-		        if (!streaming) {
-		            height = video.videoHeight / (video.videoWidth / width);
+			config.zipFileName = (this.$zipNameEle.val())?this.$zipNameEle.val()+".zip":def_zip;
 
-		            if (isNaN(height)) {
-		                height = width / (4 / 3);
-		            }
+			try {
+			  fs.accessSync(config.destFolder);
+			} catch (e) {
+			  	return res.json({ 
+					error: e.error
+				});
+			}
 
-		            video.setAttribute("width", width.toString());
-		            video.setAttribute("height", height.toString());
-		            canvas.setAttribute("width", width.toString());
-		            canvas.setAttribute("height", height.toString());
-		            streaming = true;
+			var zipFilePath = app.getPath('desktop') + path.sep + config.zipFileName;
+			zipdir(config.destFolder, { saveTo: zipFilePath }, function (err, buffer) {
+				if (err){
+					log.error('Internal error: %s',err);
+				}
 
-		            let context = canvas.getContext("2d");
-		            if (width && height) {
-		                canvas.width = width;
-		                canvas.height = height;
-		                context.drawImage(video, 0, 0, width, height);
+				rmdir(config.destFolder, function (err, dirs, files) {
+				  console.log('all files are removed');
+				});
+			});
+		}
 
-		                canvas["toBlob"](function (data) {
-		                    video.pause();
-		                    video.src = "";
-		                    document.body.removeChild(video);
-		                    document.body.removeChild(canvas);
-		                    callback(data);
-		                });
-		            }
-		        }
-		    }, false);
+		createFolder(callback){
+			var dirPath = app.getPath('userData') + path.sep + "captures";
+			if (!fs.existsSync(dirPath)){
+			  fs.mkdirSync(dirPath);
+			}
 
-		    navigator["webkitGetUserMedia"](session, function (stream) {
-		        video.src = window["webkitURL"].createObjectURL(stream);
-		        video.play();
-		    }, function () {
-		        console.error("Can't take a screenshot");
-		    });
+			var folder = dirPath + path.sep + "HC-IMG-";
+			fs.mkdtemp(folder, (err, folder) => {
+                if (err) throw err;
+                config.destFolder = folder;
+                callback();
+            });
+		}
+
+		convertFileName(order, url){
+			url = url.replace(commentsTags, '').replace(tags, function ($0, $1) {
+				return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : ''
+			});
+
+			url = url.replace(';', '').replace('"', '').replace('\'', '/').replace('<?', '')
+			.replace('<?', '').replace(/(\r\n|\n|\r)/gm,"");
+			// .replace('\077', ' ');
+			
+			var url_wo_param = (url.indexOf("?") != -1)? url.split("?")[0]:url;
+			var domain_name = url_wo_param;
+			var disallowed = ['http://', 'https://'];
+
+			for (var d in disallowed) {
+				if(url_wo_param.indexOf(disallowed[d]) === 0) {
+					 domain_name = url_wo_param.replace(disallowed[d], '');
+				}
+			}
+
+			domain_name = domain_name.replace(/\//gi, '_').trim();
+			
+			return config.captureData.prefix + '_' + order + '_' + domain_name + '.png';
+		}
+
+		openCaptureWindow(i){
+			if("undefined" === typeof win.hc.csvUrlData || "undefined" === typeof win.hc.csvUrlData[i]) return;
+
+			var _this = this;
+			let num = i+1;
+
+			let filename = this.convertFileName(num, win.hc.csvUrlData[i]);
+
+			let bWin = new BrowserWindow({width: config.captureData.width, height: config.captureData.height})
+			let captureData = {
+				"parentId": config.mainId,
+				"captureId": bWin.id,
+				"url":win.hc.csvUrlData[i],
+				"num":num,
+				"destFolder":config.destFolder,
+				"filename":filename,
+				"prefix":config.captureData.prefix,
+				"zipname":""
+			};
+
+			bWin.loadURL(config.captureData.template)
+
+			bWin.webContents.on('did-finish-load', () => {
+				bWin.webContents.send('captureInfo', captureData)
+			})
+
+			console.log(win.hc.csvUrlData[i])
+
+			bWin.on('closed', function () {
+				bWin = null;
+				i++;
+				if(i >= win.hc.csvUrlData.length) _this.zipToDest();
+				_this.openCaptureWindow(i);
+			})
+			
 		}
 
 		onClickSubmitBtn(e){
 			e.preventDefault();
 
-			let newWin = new BrowserWindow({width: 800, height: 600})
-			let captureTemplate = "file://"+config.srcPath+"/../templates/capture.html";
+			if(confirm('진행하시겠습니까?')){
+				var _this = this;
 
-			let captureData = {
-				"parentId": config.mainId,
-				"captureId": newWin.id,
-				"url":"http://www.samsung.com/br/home/"
-			};
+				config.captureData = {};
 
-			newWin.loadURL(captureTemplate)
-			newWin.webContents.on('did-finish-load', () => {
-				newWin.webContents.send('captureInfo', captureData)
-			})
-			// ipc.on('setPosition', (event, arg) => {
-			//   console.log(arg)  // prints "ping"
-			  
-			// })
-			// let captureWin = BrowserWindow.fromId(config.subId);
-			// captureWin.loadURL(captureTemplate)
-			// captureWin.webContents.on('did-finish-load', () => {
-			//     captureWin.webContents.send('captureInfo', captureData)
-			//   })
-		// myWindow.webContents.send('an-event-from-window-zero');
-  //   	ipc.send('setPosition', 'ping');
+				config.captureData.prefix = (this.$prefixEle.val())?this.$prefixEle.val():"HC";
+				config.captureData.width = (this.$dimenWEle.val())?parseInt(this.$dimenWEle.val()):1280;
+				config.captureData.height = (this.$dimenHEle.val())?parseInt(this.$dimenHEle.val()):768;
+				config.captureData.noHeight = (this.$noHeightEle.is(":checked"))?true:false;
 
+				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
+				this.createFolder(function(){
+					_this.openCaptureWindow(0);
+				});
+			}
 		}
 
 		onClickUrlList(e){
@@ -452,7 +499,7 @@ const {BrowserWindow} = require('electron').remote
 
 			// first URL displaying webview
 			var initUrl = (newDataArr.length > 0 && 'undefined' !== newDataArr[0])? newDataArr[0]:"http://www.hivelab.co.kr/";
-			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" preload="../libs/inject.js" plugins style="display:inline-flex; width:100%; height:98%"></webview>');
+			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%"></webview>');
 
 			document.getElementById('webView').addEventListener('console-message', function(e) {
 		        console.log(e.message);

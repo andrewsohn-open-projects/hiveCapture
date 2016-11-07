@@ -1,7 +1,7 @@
 const electron = require('electron'),
-storage = require('electron-json-storage'),
 fs = require('fs'),
 async = require('async'),
+path = require('path'),
 _ = require('underscore');
 
 const config = require('./config');
@@ -12,6 +12,11 @@ const winMenu = require('./layout/win-menu');
 const BrowserWindow = electron.BrowserWindow
 // const ipcMain = electron.ipcMain
 let mainWindow;
+
+var dirPath = electron.app.getPath('userData') + path.sep + "captures";
+if (!fs.existsSync(dirPath)){
+  fs.mkdirSync(dirPath);
+}
 
 function createWindow () {
   // Create the browser window.
