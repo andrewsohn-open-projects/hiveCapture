@@ -378,8 +378,13 @@ const {app, BrowserWindow} = require('electron').remote
 
 		onClickSubmitBtn(e){
 			e.preventDefault();
+			
+			if('undefined' === typeof win.hc.csvUrlData || win.hc.csvUrlData.length === 0 ){
+				alert("캡처 URL 목록이 존재하지 않습니다.\n다시 시도하여 주십시요.");
+				return;
+			}
 
-			if(confirm('진행하시겠습니까?')){
+			if(confirm("진행하시겠습니까?")){
 				var _this = this;
 
 				config.captureData = {};

@@ -14,8 +14,8 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-winstaller": "^2.3.4",
-    "electron-builder": "^7.14.2"
+    "electron-builder": "^7.24.1",
+    "electron-winstaller": "^2.3.4"
   },
   "dependencies": {
     "async": "^2.1.2",
