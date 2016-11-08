@@ -132,7 +132,7 @@ const {app, BrowserWindow} = require('electron').remote
 		visualizeWebView(){
 			var initUrl = (win.hc.csvUrlData.length > 0 && 'undefined' !== win.hc.csvUrlData[0])? win.hc.csvUrlData[0]:"http://www.hivelab.co.kr/";
 			var webview = this.$WebViewCont.find('webview');
-			console.log(webview)
+			webview.attr('src',initUrl);
 		}
 
 		onClickBtn(e) {
@@ -217,7 +217,7 @@ const {app, BrowserWindow} = require('electron').remote
 
         mergeCsvUrl(urls){
         	var _this = this;
-        	console.log(urls);
+        	
         	_.each(urls, function(i){
 				i = _this.reFactSecureUrl(i);
 			});
@@ -228,18 +228,20 @@ const {app, BrowserWindow} = require('electron').remote
 
         refreshUrlList(isDelAll){
         	var _this = this,
-        	newData = config.defaultStruct.data;
-        	
+        	newData = {};
+
         	if(!isDelAll){
-	        	for(var i=0; i<win.hc.csvUrlData.length; i++){
-					newData.data[i] = {"url":win.hc.csvUrlData[i]};
-				}
+				newData.data = [];
+				win.hc.csvUrlData.forEach(function(v,i){
+					newData.data[i] = {"url":v};
+				});
+
 			}else{
 				newData = {"data":[]};
 			}
 
         	fs.stat(config.dataPath, function(err, stats){
-				if(err){
+        		if(err){
 					if(err.code == 'ENOENT' || err.code == 'ENOTDIR'){
 						storage.set(config.fileNames.data, newData, function(error) {
 							if (error) throw error;
@@ -263,6 +265,7 @@ const {app, BrowserWindow} = require('electron').remote
 
 			_this.$urlCount.text(newData.data.length);
 			_this.visualizeWebView();
+        	
         }
 
 		zipToDest(){
@@ -405,16 +408,13 @@ const {app, BrowserWindow} = require('electron').remote
 				webview[0].loadURL($trg.attr('href'), win.hc.webViewOpt);
 
 			}else if($trg.hasClass(this.options.urlDeleteBtnClass)){
-				var delUrl = $trg.next('a').eq(0).attr('href'),
-				newDataArr = [];
 
-				delUrl = this.reFactSecureUrl(delUrl);
+				var index = $(e.currentTarget).find('li.DR').index($trg.parent('li.DR'));
 
-				var newData = _.without(win.hc.csvUrlData, _.findWhere(win.hc.csvUrlData, delUrl));
-
-				win.hc.csvUrlData = newData;
+				win.hc.csvUrlData.splice(index, 1);
+				
 				this.refreshUrlList();
-				// console.log(delUrl, newData);
+
 			}
 		}
 
