@@ -264,6 +264,7 @@ const {app, BrowserWindow} = require('electron').remote
 			});
 
 			_this.$urlCount.text(newData.data.length);
+			_this.changeSubmitBtn();
 			_this.visualizeWebView();
         	
         }
@@ -433,13 +434,32 @@ const {app, BrowserWindow} = require('electron').remote
 
 			return url;
 		}
+
+		changeSubmitBtn(){
+			if(win.hc.csvUrlData.length > 0){
+				
+				if(!this.$submitBtn.hasClass('disabled')) return;
+
+				this.$submitBtn.removeClass('disabled');
+				this.$submitBtn.attr('disabled', false);
+				
+			}else{
+				if(this.$submitBtn.hasClass('disabled')) return;
+
+				this.$submitBtn.addClass('disabled');
+				this.$submitBtn.attr('disabled', true);
+				
+			}
+		}
 	};
 
 	// Data transfered from Main process
 	ipc.on('info', (event, config) => {
 		win.config = config;
-		var $ul_list = $('.js-csvList');
-		var $urlCount = $('.js-listCount');
+		
+		var $ul_list = $('.js-csvList'),
+		$urlCount = $('.js-listCount'),
+		$submitBtn = $('button.js-submit-btn');
 
 		async.waterfall([
 			function(cb){
@@ -481,6 +501,10 @@ const {app, BrowserWindow} = require('electron').remote
 			var newDataArr = [];
 			
 			$urlCount.text(result.data.length);
+			if(result.data.length < 1){
+				$submitBtn.addClass('disabled');
+				$submitBtn.attr('disabled', true);
+			}
 
 			_.each(result.data, function(i){
 				var newData = i.url;
