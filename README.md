@@ -1,38 +1,38 @@
-# electron-quick-start
+HiveCapture Screen Capture Batch Tool
+=========
+Windows Application Screen Capture CSV Batch Tool presented by Hivelab Corp. Samsung Opt Team.
 
-**Clone and run for a quick way to see an Electron in action.**
 
-This is a minimal Electron application based on the [Quick Start Guide](http://electron.atom.io/docs/latest/tutorial/quick-start) within the Electron documentation.
+Requires
+------------------
+ * `electron 1.4.1`
+ * `jquery 3.1.1`
+ * `underscore 1.8.3`
+ * `electron-json-storage 2.0.1`
+ * `async 2.1.2`
 
-**Use this app along with the [Electron API Demos](http://electron.atom.io/#get-started) app for API code examples to help you get started.**
 
-A basic Electron application needs just these files:
+Change Log
+=====
+ * `v 1.0.1`
+ 	 * [bug fix] CSV URL deletion error fixed
+	 * [improved] no CSV URL validation check
+	 * [improved] unique id added in extracted zip file name
+	 * [bug fix] single wide page capture issue fixed
+	 * [improved] none lazy loading page covered
 
-- `package.json` - Points to the app's main file and lists its details and dependencies.
-- `main.js` - Starts the app and creates a browser window to render HTML. This is the app's **main process**.
-- `index.html` - A web page to render. This is the app's **renderer process**.
+ * `v 1.0.0`
+	 * [start] app initiated
+	 * [improved] extension button UI redesigned
 
-You can learn more about each of these components within the [Quick Start Guide](http://electron.atom.io/docs/latest/tutorial/quick-start).
 
-## To Use
+### 설치해야할 NPM 패키지
+- npm install -g electron
+- npm install -g electron-packager
+- npm install --saveDev electron-builder
 
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+### EXE 실행파일:
+electron-packager . hivecapture --out=dist/apps --platform=win32 --arch=x64 app-version=1.0 --icon=img/icons/hivecapture_256x256.ico --overwrite
 
-```bash
-# Clone this repository
-git clone https://github.com/electron/electron-quick-start
-# Go into the repository
-cd electron-quick-start
-# Install dependencies and run the app
-npm install && npm start
-```
-
-Learn more about Electron and its API in the [documentation](http://electron.atom.io/docs/latest).
-
-## Other Example Apps
-
-For more example apps, see the
-[list of boilerplates](http://electron.atom.io/community/#boilerplates)
-created by the awesome electron community.
-
-#### License [CC0 1.0 (Public Domain)](LICENSE.md)
+### 인스톨러:
+.\node_modules\.bin\build --platform win32 --arch x64
