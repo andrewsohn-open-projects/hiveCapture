@@ -90,5 +90,5 @@ footer{position:fixed;bottom:5px;left:0;right:0;background:rgba(255,255,255,0.5)
 footer:after{content:'';position:absolute;top:-3px;left:0;right:0;height:3px;background:linear-gradient(transparent,rgba(255,255,255,0.5))}
 footer .logo img{height:8px}
 
-.dimmed{position:fixed;left:0;top:0;right:0;bottom:0;opacity:0.7;background-color:#fff}
+.dimmed{position:fixed;left:0;top:0;right:0;bottom:0;opacity:0.7;background-color:#fff;z-index:900}
 .loading-box{position:fixed;left:0;top:0;right:0;bottom:0;width:120px;height:120px;margin:auto;background:url(../img/loading.gif) no-repeat}

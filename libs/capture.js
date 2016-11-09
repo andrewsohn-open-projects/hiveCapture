@@ -37,21 +37,6 @@ const {app, BrowserWindow, clipboard} = electron.remote
 
 		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" plugins style="display:inline-flex; width:100%; height:100%"></webview>');
 		
-		// document.getElementById('webView').addEventListener('console-message', function(e) {
-		// 	// scrollDownCapture(e.message);
-		// 	var scrollHeight = parseInt(e.message);
-		// 	if(isNaN(scrollHeight)) return;
-
-		// 	var count = 0,
-		// 	times = Math.ceil(scrollHeight/winHeight);
-		// 	// times=1;
-			
-		// 	// console.log(scrollHeight, winHeight, times)
-
-		// 	async.whilst(
-		// 	    function() { return count < times; },
-		// 	    function(callback) {
-		// 	        count++;
 		$('body').find('webview').on('dom-ready', () => {
         	// $('body').find('webview')[0].openDevTools();
         	$('body').find('webview')[0].send('winConfig', config)

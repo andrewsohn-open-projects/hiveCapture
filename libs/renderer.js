@@ -59,7 +59,10 @@ const {app, BrowserWindow} = require('electron').remote
 				dimenWEle:'input[name=dimenW]',
 				dimenHEle:'input[name=dimenH]',
 				noHeightEle:'input[name=noVert]',
-				urlCount:'.js-listCount'
+				lazyLoadEle:'input[name=isLazyLoad]',
+				urlCount:'.js-listCount',
+				dimmedEle:'.dimmed',
+				loadingEle:'.loading-box'
 			};
 		}
 		constructor(settings){
@@ -91,6 +94,7 @@ const {app, BrowserWindow} = require('electron').remote
 			this.$dimenWEle = this.$contLayoutA.find(this.options.dimenWEle);
 			this.$dimenHEle = this.$contLayoutA.find(this.options.dimenHEle);
 			this.$noHeightEle = this.$contLayoutA.find(this.options.noHeightEle);
+			this.$lazyLoadEle = this.$contLayoutA.find(this.options.lazyLoadEle);
 
 			//Layout B
 			this.$contLayoutB = this.$contLayout.find(this.options.layoutB);
@@ -102,6 +106,8 @@ const {app, BrowserWindow} = require('electron').remote
 			this.$WebViewCont = this.$contLayoutB.find(this.options.layoutWebView);
 			// this.$webview = this.$contLayoutB.find(this.options.webViewId);
 
+			this.$dimmedEle = this.body.find(this.options.dimmedEle);
+			this.$loadingEle = this.body.find(this.options.loadingEle);
 			this.$fileEle = this.body.find(this.options.csvEle);
 			this.$submitBtn = this.body.find(this.options.submitBtnClass);
 		}
@@ -139,6 +145,16 @@ const {app, BrowserWindow} = require('electron').remote
             e.preventDefault();
             var target = $(e.currentTarget);
             this.$fileEle.trigger('click');
+        }
+
+        enableLoading(){
+        	this.$dimmedEle.show();
+        	this.$loadingEle.show();
+        }
+
+        disableLoading(){
+        	this.$dimmedEle.hide();
+        	this.$loadingEle.hide();
         }
 
         onFileChange(e){
@@ -270,15 +286,20 @@ const {app, BrowserWindow} = require('electron').remote
         }
 
 		zipToDest(){
-			var nowDate = new Date();
-			var month = nowDate.getMonth()+1;
-			var day = nowDate.getDate();
-			var year = nowDate.getFullYear();
+			var nowDate = new Date(),
+			month = nowDate.getMonth()+1,
+			day = nowDate.getDate(),
+			year = nowDate.getFullYear(),
+			_this = this;
 
 			if (month   < 10) {month   = "0"+month;}
 			if (day < 10) {day = "0"+day;}
 
-			var def_zip = "HC_" + year + '-' + month + '-' + day + ".zip";
+			var destFolder_sep_arr = config.destFolder.split(path.sep);
+			
+			var zipUUid_arr = destFolder_sep_arr[destFolder_sep_arr.length-1].split("-");
+
+			var def_zip = "HC_" + year + '-' + month + '-' + day + "_" + zipUUid_arr[zipUUid_arr.length-1] + ".zip";
 
 			config.zipFileName = (this.$zipNameEle.val())?this.$zipNameEle.val()+".zip":def_zip;
 
@@ -298,6 +319,8 @@ const {app, BrowserWindow} = require('electron').remote
 
 				rmdir(config.destFolder, function (err, dirs, files) {
 				  console.log('all files are removed');
+				  _this.disableLoading();
+				  alert('일괄 캡처를 완료하였습니다.');
 				});
 			});
 		}
@@ -348,7 +371,15 @@ const {app, BrowserWindow} = require('electron').remote
 
 			let filename = this.convertFileName(num, win.hc.csvUrlData[i]);
 
-			let bWin = new BrowserWindow({width: config.captureData.width, height: config.captureData.height})
+			let captureBrowserSetting = {width: config.captureData.width+16, height: config.captureData.height};
+
+			captureBrowserSetting.show = false;
+
+			let bWin = new BrowserWindow(captureBrowserSetting)
+			
+			bWin.setMenuBarVisibility(false);
+			bWin.setAutoHideMenuBar(true);
+
 			let captureData = {
 				"parentId": config.mainId,
 				"captureId": bWin.id,
@@ -357,7 +388,8 @@ const {app, BrowserWindow} = require('electron').remote
 				"destFolder":config.destFolder,
 				"filename":filename,
 				"prefix":config.captureData.prefix,
-				"zipname":""
+				"zipname":"",
+				"isLazyLoad":config.captureData.isLazyLoad
 			};
 
 			bWin.loadURL(config.captureData.template)
@@ -394,8 +426,10 @@ const {app, BrowserWindow} = require('electron').remote
 				config.captureData.width = (this.$dimenWEle.val())?parseInt(this.$dimenWEle.val()):1280;
 				config.captureData.height = (this.$dimenHEle.val())?parseInt(this.$dimenHEle.val()):768;
 				config.captureData.noHeight = (this.$noHeightEle.is(":checked"))?true:false;
+				config.captureData.isLazyLoad = (this.$lazyLoadEle.is(":checked"))?true:false;
 
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
+				this.enableLoading();
 				this.createFolder(function(){
 					_this.openCaptureWindow(0);
 				});
@@ -528,7 +562,7 @@ const {app, BrowserWindow} = require('electron').remote
 
 			// first URL displaying webview
 			var initUrl = (newDataArr.length > 0 && 'undefined' !== newDataArr[0])? newDataArr[0]:"http://www.hivelab.co.kr/";
-			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%"></webview>');
+			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%" preload="../libs/mainWebView.js"></webview>');
 
 			document.getElementById('webView').addEventListener('console-message', function(e) {
 		        console.log(e.message);
