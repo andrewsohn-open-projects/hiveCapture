@@ -20,59 +20,98 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
 window.addEventListener('load', ()=> {
     // document.body.style.overflow = 'hidden';
     document.body.style.height = 'auto';
-    // if(/m/g.test(captureInfo.device)){
+    
 
-    // }else{
+    if(/m/g.test(captureInfo.device)){
+        if(winConfig.isLazyLoad){
+            async.waterfall([
+                function(cb){
+                    let res = {};
 
-    // }
-    if(document.body.scrollHeight > window.innerHeight){
-        async.waterfall([
-            function(cb){
-                let res = {};
-
-                if(winConfig.isLazyLoad){
                     scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 800, function(){
                         cb(null, res);
                     });
-                }else{
-                    cb(null, res);
-                }
-                
-            },
-            function(res, cb){
-                if(winConfig.isLazyLoad){
+                    
+                },
+                function(res, cb){
+                    
                     scrollTop(document.body, 800, function(){
                         cb(null, res);
                     });
-                }else{
-                    cb(null, res);
+                    
+                },
+                function(res, cb){
+                    // canvas.width = Math.round(window.innerWidth);
+                    // canvas.height = document.body.scrollHeight
+                    // // document.body.innerHTML = "";
+                    // document.body.appendChild(canvas);
+
+                    // scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight - 17, 2000, function(){
+                    //     cb(null, res);
+                    // });
                 }
+            ], function(err, result){
                 
-            },
-            function(res, cb){
+                
+            });
+        }else{
+
+        }
+        console.log('1',winConfig.isLazyLoad)
+        // console.log('2',document.body.scrollHeight, window.innerHeight)
+    }else{
+        if(document.body.scrollHeight > window.innerHeight){
+            
+            async.waterfall([
+                function(cb){
+                    let res = {};
+
+                    if(winConfig.isLazyLoad){
+                        scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 800, function(){
+                            cb(null, res);
+                        });
+                    }else{
+                        cb(null, res);
+                    }
+                    
+                },
+                function(res, cb){
+                    if(winConfig.isLazyLoad){
+                        scrollTop(document.body, 800, function(){
+                            cb(null, res);
+                        });
+                    }else{
+                        cb(null, res);
+                    }
+                    
+                },
+                function(res, cb){
+                    canvas.width = Math.round(window.innerWidth);
+                    canvas.height = document.body.scrollHeight
+                    // document.body.innerHTML = "";
+                    document.body.appendChild(canvas);
+
+                    scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight - 17, 2000, function(){
+                        cb(null, res);
+                    });
+                }
+            ], function(err, result){
+                
+                
+            });
+
+        }else{
+            
+            setTimeout(function() {
                 canvas.width = Math.round(window.innerWidth);
                 canvas.height = document.body.scrollHeight
                 // document.body.innerHTML = "";
                 document.body.appendChild(canvas);
-
-                scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight - 17, 2000, function(){
-                    cb(null, res);
-                });
-            }
-        ], function(err, result){
-            
-            
-        });
-
-    }else{
-        setTimeout(function() {
-            canvas.width = Math.round(window.innerWidth);
-            canvas.height = document.body.scrollHeight
-            // document.body.innerHTML = "";
-            document.body.appendChild(canvas);
-            snapAll();
-        }, 1000);
+                snapAll();
+            }, 1000);
+        }
     }
+    
 });
 
 function scrollBottom(element, destH, frameH, duration, callback) {
@@ -81,6 +120,16 @@ function scrollBottom(element, destH, frameH, duration, callback) {
     setTimeout(function() {
         element.scrollTop = (destH - frameH);
 
+// var sheight = document.compatMode == "CSS1Compat" ? document.documentElement.scrollHeight : document.body.scrollHeight;
+var sheight;
+
+if (navigator.userAgent.indexOf("MSIE 5.5")!=-1) {
+sheight = document.body.scrollHeight;
+} else {
+sheight = document.documentElement.scrollHeight;
+}
+
+console.log((destH - frameH),sheight)
         // if (startH >= (destH-frameH)) return;
         
         // scrollTo(element, startH, destH, frameH, duration);

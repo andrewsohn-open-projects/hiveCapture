@@ -6,7 +6,8 @@ path = require('path'),
 _ = require('underscore'),
 zipdir = require('zip-dir'),
 rmdir = require('rmdir'),
-messages = require('./message.js');
+messages = require('./message.js'),
+devices = require('./devices.js');
 
 const {app, BrowserWindow} = require('electron').remote
 
@@ -60,6 +61,7 @@ const {app, BrowserWindow} = require('electron').remote
 				dimenHEle:'input[name=dimenH]',
 				noHeightEle:'input[name=noVert]',
 				lazyLoadEle:'input[name=isLazyLoad]',
+				deviceSelEle:'select[name=device]',
 				urlCount:'.js-listCount',
 				dimmedEle:'.dimmed',
 				loadingEle:'.loading-box'
@@ -95,7 +97,8 @@ const {app, BrowserWindow} = require('electron').remote
 			this.$dimenHEle = this.$contLayoutA.find(this.options.dimenHEle);
 			this.$noHeightEle = this.$contLayoutA.find(this.options.noHeightEle);
 			this.$lazyLoadEle = this.$contLayoutA.find(this.options.lazyLoadEle);
-
+			this.$deviceSelEle = this.$contLayoutA.find(this.options.deviceSelEle);
+			
 			//Layout B
 			this.$contLayoutB = this.$contLayout.find(this.options.layoutB);
 			this.$urlList = this.$contLayoutB.find(this.options.urlListClass);
@@ -118,6 +121,8 @@ const {app, BrowserWindow} = require('electron').remote
 
 			this.$contLayout.enhsplitter({minSize: 50, vertical: false});
         	this.$contLayoutB.enhsplitter();
+
+        	this.$deviceSelEle.on('change', $.proxy(this.onDeviceChange, this));
 
         	// Config Layer
         	this.$csvUploadBtn.on('click', $.proxy(this.onClickBtn, this));
@@ -162,7 +167,7 @@ const {app, BrowserWindow} = require('electron').remote
             , ext = trg.val().split(".").pop().toLowerCase();
 
             if($.inArray(ext, ["csv"]) == -1) {
-                alert('Please upload a proper CSV file.');
+                alert(messages.ImproperCSVAttached.message);
                 return false;
             }
                 
@@ -320,7 +325,7 @@ const {app, BrowserWindow} = require('electron').remote
 				rmdir(config.destFolder, function (err, dirs, files) {
 				  console.log('all files are removed');
 				  _this.disableLoading();
-				  alert('일괄 캡처를 완료하였습니다.');
+				  alert(messages.complete.message);
 				});
 			});
 		}
@@ -389,10 +394,15 @@ const {app, BrowserWindow} = require('electron').remote
 				"filename":filename,
 				"prefix":config.captureData.prefix,
 				"zipname":"",
-				"isLazyLoad":config.captureData.isLazyLoad
+				"isLazyLoad":config.captureData.isLazyLoad,
+				"device":config.captureData.deviceType
 			};
 
-			bWin.loadURL(config.captureData.template)
+			let httpOption = {
+				"userAgent":config.captureData.userAgent
+			};
+
+			bWin.loadURL(config.captureData.template, httpOption)
 
 			bWin.webContents.on('did-finish-load', () => {
 				bWin.webContents.send('captureInfo', captureData)
@@ -413,11 +423,11 @@ const {app, BrowserWindow} = require('electron').remote
 			e.preventDefault();
 			
 			if('undefined' === typeof win.hc.csvUrlData || win.hc.csvUrlData.length === 0 ){
-				alert("캡처 URL 목록이 존재하지 않습니다.\n다시 시도하여 주십시요.");
+				alert(messages.outOfCsvUrl.message);
 				return;
 			}
 
-			if(confirm("진행하시겠습니까?")){
+			if(confirm(messages.proceed.message)){
 				var _this = this;
 
 				config.captureData = {};
@@ -427,13 +437,104 @@ const {app, BrowserWindow} = require('electron').remote
 				config.captureData.height = (this.$dimenHEle.val())?parseInt(this.$dimenHEle.val()):768;
 				config.captureData.noHeight = (this.$noHeightEle.is(":checked"))?true:false;
 				config.captureData.isLazyLoad = (this.$lazyLoadEle.is(":checked"))?true:false;
-
+				config.captureData.deviceType = this.$deviceSelEle.val();
+				config.captureData.userAgent = _this.setDevice();
+				
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
 				this.enableLoading();
 				this.createFolder(function(){
 					_this.openCaptureWindow(0);
 				});
 			}
+		}
+
+		setDevice(){
+			var usrAgent = "",
+			device = (this.$deviceSelEle.val())?this.$deviceSelEle.val():"pc-win";
+
+			switch(device){
+				case "pc-win":
+				usrAgent = devices["pc-win7"].userAgent.ie11;// Windows 7 IE 11
+				break;
+				case "pc-mac":
+				usrAgent = devices["pc-mac"].userAgent.safari;// MacOS safari
+				break;
+				case "m-galaxyS6":
+				usrAgent = devices["m-galaxyS6"].userAgent.default;
+				break;
+				case "m-galaxyS5":
+				usrAgent = devices["m-galaxyS5"].userAgent.default;
+				break;
+				case "m-galaxyS4":
+				usrAgent = devices["m-galaxyS4"].userAgent.default;
+				break;
+				case "m-galaxyS3":
+				usrAgent = devices["m-galaxyS3"].userAgent.default;
+				break;
+				case "m-iphone6":
+				usrAgent = devices["m-iphone6"].userAgent.default;
+				break;
+				case "m-iphone6p":
+				usrAgent = devices["m-iphone6p"].userAgent.default;
+				break;
+				case "t-ipad":
+				usrAgent = devices["t-ipad"].userAgent.default;
+				break;
+				case "t-galaxyTab":
+				usrAgent = devices["t-galaxyTab"].userAgent.default;
+				break;
+				default:
+				usrAgent = devices.othr.userAgent.default;
+				break;
+			}
+
+			console.log(devices, usrAgent)
+			return usrAgent;
+		}
+
+		onDeviceChange(e){
+			var $trg = $(e.currentTarget),
+			device = $trg.val(),
+			dim = {};
+
+			switch(device){
+				case "pc-win":
+				dim = devices["pc-win7"].dimension;// Windows 7 IE 11
+				break;
+				case "pc-mac":
+				dim = devices["pc-mac"].dimension;// MacOS safari
+				break;
+				case "m-galaxyS6":
+				dim = devices["m-galaxyS6"].dimension;
+				break;
+				case "m-galaxyS5":
+				dim = devices["m-galaxyS5"].dimension;
+				break;
+				case "m-galaxyS4":
+				dim = devices["m-galaxyS4"].dimension;
+				break;
+				case "m-galaxyS3":
+				dim = devices["m-galaxyS3"].dimension;
+				break;
+				case "m-iphone6":
+				dim = devices["m-iphone6"].dimension;
+				break;
+				case "m-iphone6p":
+				dim = devices["m-iphone6p"].dimension;
+				break;
+				case "t-ipad":
+				dim = devices["t-ipad"].dimension;
+				break;
+				case "t-galaxyTab":
+				dim = devices["t-galaxyTab"].dimension;
+				break;
+				default:
+				dim = devices.othr.dimension;
+				break;
+			}
+
+			this.$dimenWEle.val(dim.w);
+			this.$dimenHEle.val(dim.h);
 		}
 
 		onClickUrlList(e){

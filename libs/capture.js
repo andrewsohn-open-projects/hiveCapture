@@ -33,9 +33,9 @@ const {app, BrowserWindow, clipboard} = electron.remote
 			// window 닫기 기능 
 		}
 		
-		clipboard.writeText(""+win.config.captureId, 'captueWinId')
+		clipboard.writeText("{\"winId\":"+win.config.captureId+",\"device\":\""+win.config.device+"\"}", 'captueInfo')
 
-		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" plugins style="display:inline-flex; width:100%; height:100%"></webview>');
+		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" style="display:inline-flex; width:100%; height:100%; overflow:hidden;" autosize="on"></webview>');
 		
 		$('body').find('webview').on('dom-ready', () => {
         	// $('body').find('webview')[0].openDevTools();
