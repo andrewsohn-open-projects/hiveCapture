@@ -20,6 +20,7 @@ Change Log
 	 * [improved] unique id added in extracted zip file name
 	 * [bug fix] single wide page capture issue fixed
 	 * [improved] none lazy loading page covered
+	 * [improved] webview user agent function added
 
  * `v 1.0.0`
 	 * [start] app initiated
