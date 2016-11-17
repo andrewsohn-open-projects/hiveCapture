@@ -11,27 +11,45 @@ var segCount;
 
 var captureInfo = JSON.parse(clipboard.readText('captueInfo'));
 let thisWin = BrowserWindow.fromId(captureInfo.winId)
-
+let bWin;
 let winConfig;
+
 electron.ipcRenderer.on('winConfig', (event, config) => {
     winConfig = config;
+    
+    let captureBrowserSetting = {width: winConfig.size.width, height: winConfig.size.height};
+    
+    captureBrowserSetting.show = false;
+    
+    bWin = new BrowserWindow(captureBrowserSetting);
+    // bWin.openDevTools();
+    bWin.on('closed', function () {
+        thisWin.close()
+    })
+
+    let canvasInfo = {
+        "height":document.body.scrollHeight,
+        "destFolder":winConfig.destFolder,
+        "filename":winConfig.filename
+    }
+
+    bWin.webContents.on('did-finish-load', () => {
+        bWin.webContents.send('canvasInfo', canvasInfo)
+    })
+    
 })
 
 window.addEventListener('load', ()=> {
     // document.body.style.overflow = 'hidden';
     document.body.style.height = 'auto';
-    // if(/m/g.test(captureInfo.device)){
-
-    // }else{
-
-    // }
+    
     if(document.body.scrollHeight > window.innerHeight){
         async.waterfall([
             function(cb){
                 let res = {};
 
                 if(winConfig.isLazyLoad){
-                    scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 800, function(){
+                    scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 500, function(){
                         cb(null, res);
                     });
                 }else{
@@ -41,7 +59,7 @@ window.addEventListener('load', ()=> {
             },
             function(res, cb){
                 if(winConfig.isLazyLoad){
-                    scrollTop(document.body, 800, function(){
+                    scrollTop(document.body, 500, function(){
                         cb(null, res);
                     });
                 }else{
@@ -50,12 +68,9 @@ window.addEventListener('load', ()=> {
                 
             },
             function(res, cb){
-                canvas.width = Math.round(window.innerWidth);
-                canvas.height = document.body.scrollHeight
-                // document.body.innerHTML = "";
-                document.body.appendChild(canvas);
-
-                scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight - 17, 2000, function(){
+                setCanvasWindow(canvas);
+                
+                scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight, 1400, function(){
                     cb(null, res);
                 });
             }
@@ -66,12 +81,9 @@ window.addEventListener('load', ()=> {
 
     }else{
         setTimeout(function() {
-            canvas.width = Math.round(window.innerWidth);
-            canvas.height = document.body.scrollHeight
-            // document.body.innerHTML = "";
-            document.body.appendChild(canvas);
+            setCanvasWindow(canvas);
             snapAll();
-        }, 1000);
+        }, 500);
     }
 });
 
@@ -111,17 +123,29 @@ function scrollTo(element, curH, destH, frameH, duration){
 
         var num = parseInt(curH/frameH);
 
-        if(segCount == num){
-            leftOverLength = destH - (frameH * segCount);
-            isLast = true;
-        }
+        // if(segCount == num){
+        //     leftOverLength = destH - (frameH * segCount);
+        //     isLast = true;
+        // }
 
-        snap(num, curH, isLast, leftOverLength, function(){
+        snap(num, curH, isLast, leftOverLength, function(image, x, posY){
+            let canvasInfo = {
+                "num":num,
+                "width":image.getSize().width,
+                "height":image.getSize().height,
+                "src":image.toDataURL(),
+                "x":x,
+                "posY":posY,
+                "isLast":isLast
+            };
+
+            bWin.webContents.send('imageInfo', canvasInfo)
+            
             if (curH >= (destH-frameH)){
                 scrollSnapBottom(element, num+1, destH, frameH, duration);
                 return;
             }
-            
+
             scrollTo(element, curH, destH, frameH, duration);
         });
     }, duration);
@@ -150,40 +174,51 @@ function scrollAnim(element, startH, destH, frameH, duration, callback) {
 }
 
 function snap(num, posY, isLast, leftOverLength, callback){
-    let rect = {x:0, y:0, width:Math.round(window.innerWidth - 17), height:Math.round(window.innerHeight - 17)};
+    let rect = {x:0, y:0, width:Math.round(window.innerWidth-17), height:Math.round(window.innerHeight)};
 
     if(isLast && leftOverLength !== null) rect.height = leftOverLength;
 
     thisWin.capturePage(rect,function(image){
-
-        var myIage = new Image();
-        myIage.width = image.getSize().width;
-        myIage.height = image.getSize().height;
-        myIage.src = image.toDataURL();
-        myIage.onload = function(){
-            var y = posY - image.getSize().height;
-            ctx.drawImage(myIage, 0, y);
-            callback();
-        };
+        // var y = posY - image.getSize().height;
+        callback(image, 0, posY);
+        // var myIage = new Image();
+        // myIage.width = image.getSize().width;
+        // myIage.height = image.getSize().height;
+        // myIage.src = image.toDataURL();
+        // myIage.onload = function(){
+        //     var y = posY - image.getSize().height;
+        //     ctx.drawImage(myIage, 0, y);
+            
+        // };
         
-        if(num > segCount){
-            var imgData = canvas.toDataURL();
-            var data = imgData.replace(/^data:image\/\w+;base64,/, "");
-            var buf = new Buffer(data, 'base64');
-            var dest = winConfig.destFolder + "/"+winConfig.filename;
+        // if(num > segCount){
+        //     var imgData = canvas.toDataURL();
+        //     var data = imgData.replace(/^data:image\/\w+;base64,/, "");
+        //     var buf = new Buffer(data, 'base64');
+        //     var dest = winConfig.destFolder + "/"+winConfig.filename;
 
-            writeFile(dest, buf);
-        }
+        //     writeFile(dest, buf);
+        // }
     });
 }
 
 function scrollSnapBottom(element, num, destH, frameH, duration){
     setTimeout(function() {
-        var y = destH - frameH;
-        element.scrollTop = y;
+        element.scrollTop = destH;
 
-        snap(num, y, null, null, function(){
-            return;
+        snap(num, destH, null, null, function(image, x, posY){
+            let canvasInfo = {
+                "num":num,
+                "width":image.getSize().width,
+                "height":image.getSize().height,
+                "src":image.toDataURL(),
+                "x":x,
+                "posY":posY,
+                "isLast":true,
+                "winId":bWin.id
+            };
+
+            bWin.webContents.send('imageInfo', canvasInfo)
         });
         
     }, duration);
@@ -203,6 +238,21 @@ function writeFile(dest, buf){
     fs.writeFile(dest, buf, function(err) {
       if(err) console.log(err);
 
-      thisWin.close()
+      bWin.close();
+      thisWin.close();
     });
+}
+
+function setCanvasWindow(canvas){
+    let template = "file://"+winConfig.srcPath+"/../templates/canvas.html";
+    
+    bWin.setMenuBarVisibility(false);
+    bWin.setAutoHideMenuBar(true);
+
+    let httpOption = {
+        "userAgent":winConfig.userAgent
+    };
+
+    bWin.loadURL(template, httpOption)
+
 }

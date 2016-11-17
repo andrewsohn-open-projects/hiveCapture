@@ -20,7 +20,11 @@ if (!fs.existsSync(dirPath)){
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1200, height: 750})
+  mainWindow = new BrowserWindow({
+    width: 1200
+    , height: 750
+    // , frame: false
+  })
   
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/../templates/index.html`)

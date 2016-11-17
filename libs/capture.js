@@ -1,29 +1,11 @@
 const electron = require('electron'),
 fs = require('fs'),
-async = require('async'),
-_ = require('underscore'),
 messages = require('./message.js');
 
 const {app, BrowserWindow, clipboard} = electron.remote
 
 ;(function(win, $, ipc){
 	'use strict';
-
-	if (typeof win.hc === 'undefined') {
-		win.hc = {};
-	}
-
-	if (typeof win.hc.csvUrlData === 'undefined') {
-		win.hc.csvUrlData = {};
-	}
-
-	if (typeof win.hc.webViewOpt === 'undefined') {
-		win.hc.webViewOpt = {
-			httpReferrer:'',
-			userAgent:'',
-			extraHeaders:''
-		};
-	}
 
 	// Data transfered from Main process
 	ipc.on('captureInfo', (event, config) => {

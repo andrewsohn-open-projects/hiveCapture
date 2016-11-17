@@ -1,7 +1,7 @@
 {
   "name": "hivecapture",
-  "version": "1.0.1",
-  "productName": "hivecapture",
+  "version": "1.0.2",
+  "productName": "HiveCapture",
   "description": "HiveCapture :: CSV File Screen Capture App",
   "main": "libs/app.js",
   "scripts": {
@@ -14,7 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-builder": "^7.24.1",
+    "electron-builder": "^7.26.0",
     "electron-winstaller": "^2.3.4"
   },
   "dependencies": {
@@ -46,7 +46,7 @@
     },
     "win": {
       "title": "HiveCapture Tool",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "iconUrl": "http://uxd.hivelab.co.kr/users/sohn/hivecapture_256x256.ico",
       "icon": "img/icons/hivecapture_256x256.ico",
       "msi": true,

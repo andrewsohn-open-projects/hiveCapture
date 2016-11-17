@@ -9,7 +9,7 @@ rmdir = require('rmdir'),
 messages = require('./message.js'),
 devices = require('./devices.js');
 
-const {app, BrowserWindow} = require('electron').remote
+const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 ;(function(win, $, ipc){
 	'use strict';
@@ -44,6 +44,7 @@ const {app, BrowserWindow} = require('electron').remote
 			// this.text = '';
 			return {
 				csvUploadBtn: '#csvInsrtBtn',
+				csvAddBtn: '#csvAddBtn',
 				urlListClass:'.js-csvList',
 				submitBtnClass:'.js-submit-btn',
 				urlBtnClass:'js-url-btn',
@@ -64,7 +65,10 @@ const {app, BrowserWindow} = require('electron').remote
 				deviceSelEle:'select[name=device]',
 				urlCount:'.js-listCount',
 				dimmedEle:'.dimmed',
-				loadingEle:'.loading-box'
+				loadingEle:'.loading-box',
+				webBtnsCont:'.web_btns',
+				zoomOut:'.js-zoom-out',
+				zoomIn:'.js-zoom-in'
 			};
 		}
 		constructor(settings){
@@ -73,6 +77,7 @@ const {app, BrowserWindow} = require('electron').remote
 		}
 
 		init(){
+			this.zoomFactor = 1;
 			// console.log(this.options)
 			this.assigneElements();
 			this.bindEvents();
@@ -90,23 +95,28 @@ const {app, BrowserWindow} = require('electron').remote
 
 			//Layout A
 			this.$contLayoutA = this.$contLayout.find(this.options.layoutA);
-			this.$csvUploadBtn = this.$contLayoutA.find(this.options.csvUploadBtn);
-			this.$prefixEle = this.$contLayoutA.find(this.options.prefixEle);
-			this.$zipNameEle = this.$contLayoutA.find(this.options.zipNameEle);
-			this.$dimenWEle = this.$contLayoutA.find(this.options.dimenWEle);
-			this.$dimenHEle = this.$contLayoutA.find(this.options.dimenHEle);
-			this.$noHeightEle = this.$contLayoutA.find(this.options.noHeightEle);
-			this.$lazyLoadEle = this.$contLayoutA.find(this.options.lazyLoadEle);
-			this.$deviceSelEle = this.$contLayoutA.find(this.options.deviceSelEle);
+			// web view container
+			this.$WebViewCont = this.$contLayoutA.find(this.options.layoutWebView);
+
+			this.$webBtnsCont = this.$contLayoutA.find(this.options.webBtnsCont);
+			this.$zoomOutBtn = this.$webBtnsCont.find(this.options.zoomOut);
+			this.$zoomInBtn = this.$webBtnsCont.find(this.options.zoomIn);
 			
 			//Layout B
 			this.$contLayoutB = this.$contLayout.find(this.options.layoutB);
 			this.$urlList = this.$contLayoutB.find(this.options.urlListClass);
 			this.$urlCount = this.$contLayoutB.find(this.options.urlCount);
 			this.$urlDelAll = this.$contLayoutB.find(this.options.urlDelAllBtn);
+			this.$csvUploadBtn = this.$contLayoutB.find(this.options.csvUploadBtn);
+			this.$csvAddBtn = this.$contLayoutB.find(this.options.csvAddBtn);
+			this.$prefixEle = this.$contLayoutB.find(this.options.prefixEle);
+			this.$zipNameEle = this.$contLayoutB.find(this.options.zipNameEle);
+			this.$dimenWEle = this.$contLayoutB.find(this.options.dimenWEle);
+			this.$dimenHEle = this.$contLayoutB.find(this.options.dimenHEle);
+			this.$noHeightEle = this.$contLayoutB.find(this.options.noHeightEle);
+			this.$lazyLoadEle = this.$contLayoutB.find(this.options.lazyLoadEle);
+			this.$deviceSelEle = this.$contLayoutB.find(this.options.deviceSelEle);
 			
-			// web view container
-			this.$WebViewCont = this.$contLayoutB.find(this.options.layoutWebView);
 			// this.$webview = this.$contLayoutB.find(this.options.webViewId);
 
 			this.$dimmedEle = this.body.find(this.options.dimmedEle);
@@ -119,13 +129,18 @@ const {app, BrowserWindow} = require('electron').remote
 			// console.log(this.$webview[0]);
 			// this.$webview[0].openDevTools();
 
-			this.$contLayout.enhsplitter({minSize: 50, vertical: false});
-        	this.$contLayoutB.enhsplitter();
+			this.$contLayout.enhsplitter();
+        	this.$contLayoutB.enhsplitter({minSize: 50, vertical: false});
 
         	this.$deviceSelEle.on('change', $.proxy(this.onDeviceChange, this));
 
+        	this.$zoomOutBtn.on('click', $.proxy(this.onClickZoom, this));
+			this.$zoomInBtn.on('click', $.proxy(this.onClickZoom, this));
+
         	// Config Layer
         	this.$csvUploadBtn.on('click', $.proxy(this.onClickBtn, this));
+        	this.$csvAddBtn.on('click', $.proxy(this.onClickAddBtn, this));
+        	
         	this.$fileEle.on('change', $.proxy(this.onFileChange, this));
 			this.$submitBtn.on('click', $.proxy(this.onClickSubmitBtn, this));
 
@@ -133,22 +148,57 @@ const {app, BrowserWindow} = require('electron').remote
 			this.$urlList.on('click', $.proxy(this.onClickUrlList, this));
 		}
 
+		onClickZoom(e){
+			e.preventDefault();
+			var target = $(e.currentTarget);
+
+			this.$webview = this.$WebViewCont.find('webview');
+
+			if(target.hasClass(this.options.zoomOut.split('.')[1])){
+				
+				this.zoomFactor = this.zoomFactor - 0.5;
+				this.$webview[0].setZoomFactor(this.zoomFactor)
+
+			}else if(target.hasClass(this.options.zoomIn.split('.')[1])){
+
+				this.zoomFactor = this.zoomFactor + 0.5;
+				this.$webview[0].setZoomFactor(this.zoomFactor)
+
+			}
+			
+			this.showZoomRatio();
+		}
+
+		showZoomRatio(){
+			//show
+			setTimeout(function(){
+
+			},1000);
+		}
+
 		onClickDelAll(e){
 			e.preventDefault();
             // var $trg = $(e.currentTarget);
-            win.hc.csvUrlData = [];
-            this.refreshUrlList(true);
+            this.resetCsvUrl();
 		}
 
 		visualizeWebView(){
 			var initUrl = (win.hc.csvUrlData.length > 0 && 'undefined' !== win.hc.csvUrlData[0])? win.hc.csvUrlData[0]:"http://www.hivelab.co.kr/";
-			var webview = this.$WebViewCont.find('webview');
-			webview.attr('src',initUrl);
+			this.$webview = this.$WebViewCont.find('webview');
+			this.$webview.attr('src',initUrl);
 		}
 
 		onClickBtn(e) {
             e.preventDefault();
             var target = $(e.currentTarget);
+            this.fileUploadType = "upload";
+            this.$fileEle.trigger('click');
+        }
+
+        onClickAddBtn(e) {
+            e.preventDefault();
+            var target = $(e.currentTarget);
+            this.fileUploadType = "add";
             this.$fileEle.trigger('click');
         }
 
@@ -162,7 +212,7 @@ const {app, BrowserWindow} = require('electron').remote
         	this.$loadingEle.hide();
         }
 
-        onFileChange(e){
+        onFileChange(e, type){
             var trg = $(e.currentTarget)
             , ext = trg.val().split(".").pop().toLowerCase();
 
@@ -170,7 +220,7 @@ const {app, BrowserWindow} = require('electron').remote
                 alert(messages.ImproperCSVAttached.message);
                 return false;
             }
-                
+
             if (e.target.files != undefined) {
                 var _this = this
                 , reader = new FileReader();
@@ -226,7 +276,11 @@ const {app, BrowserWindow} = require('electron').remote
                         return false;
                     }
 
+                    if("undefined" !== typeof _this.fileUploadType && _this.fileUploadType === "upload") 
+                    	_this.resetCsvUrl();
+
                     _this.mergeCsvUrl(csvval);
+                    
                     _this.isFileAttached = true;
                 };
                 reader.readAsText(e.target.files.item(0));
@@ -234,6 +288,11 @@ const {app, BrowserWindow} = require('electron').remote
             }
 
             return false;
+        }
+
+        resetCsvUrl(){
+        	win.hc.csvUrlData = [];
+            this.refreshUrlList(true);
         }
 
         mergeCsvUrl(urls){
@@ -324,6 +383,9 @@ const {app, BrowserWindow} = require('electron').remote
 
 				rmdir(config.destFolder, function (err, dirs, files) {
 				  console.log('all files are removed');
+
+				  if(powerSaveBlocker.isStarted(_this.powerSaveId)) powerSaveBlocker.stop(_this.powerSaveId);				  
+
 				  _this.disableLoading();
 				  alert(messages.complete.message);
 				});
@@ -395,7 +457,9 @@ const {app, BrowserWindow} = require('electron').remote
 				"prefix":config.captureData.prefix,
 				"zipname":"",
 				"isLazyLoad":config.captureData.isLazyLoad,
-				"device":config.captureData.deviceType
+				"device":config.captureData.deviceType,
+				"srcPath":config.srcPath,
+				"size":captureBrowserSetting
 			};
 
 			let httpOption = {
@@ -408,7 +472,7 @@ const {app, BrowserWindow} = require('electron').remote
 				bWin.webContents.send('captureInfo', captureData)
 			})
 
-			console.log(win.hc.csvUrlData[i])
+			console.log(i+1, win.hc.csvUrlData[i])
 
 			bWin.on('closed', function () {
 				bWin = null;
@@ -443,6 +507,9 @@ const {app, BrowserWindow} = require('electron').remote
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
 				this.enableLoading();
 				this.createFolder(function(){
+
+					_this.powerSaveId = powerSaveBlocker.start('prevent-display-sleep');
+
 					_this.openCaptureWindow(0);
 				});
 			}
@@ -545,8 +612,8 @@ const {app, BrowserWindow} = require('electron').remote
 
 			if($trg.hasClass(this.options.urlBtnClass)){
 
-				var webview = this.$WebViewCont.find('webview');
-				webview[0].loadURL($trg.attr('href'), win.hc.webViewOpt);
+				this.$webview = this.$WebViewCont.find('webview');
+				this.$webview[0].loadURL($trg.attr('href'), win.hc.webViewOpt);
 
 			}else if($trg.hasClass(this.options.urlDeleteBtnClass)){
 
@@ -663,7 +730,7 @@ const {app, BrowserWindow} = require('electron').remote
 
 			// first URL displaying webview
 			var initUrl = (newDataArr.length > 0 && 'undefined' !== newDataArr[0])? newDataArr[0]:"http://www.hivelab.co.kr/";
-			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%" preload="../libs/mainWebView.js"></webview>');
+			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%; overflow:hidden;" preload="../libs/mainWebView.js"></webview>');
 
 			document.getElementById('webView').addEventListener('console-message', function(e) {
 		        console.log(e.message);

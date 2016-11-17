@@ -3,5 +3,5 @@ const electron = require('electron'),
 {app, BrowserWindow, clipboard} = electron.remote;
 
 window.addEventListener('load', ()=> {
-    // document.body.style.overflow = 'hidden';
+    document.body.style.height = 'auto';
 });

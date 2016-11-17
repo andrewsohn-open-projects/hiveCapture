@@ -9,7 +9,7 @@
     <style>
 
         .splitter_panel > div {
-            padding: 0 1em;
+            padding: 0;
         }
 
         #demoOne {
@@ -24,6 +24,32 @@
           background-color: #E9E9E9;
           cursor: not-allowed;
         }
+
+        .kc_fab_main_btn{
+          background-color:#F44336;
+          width:38px;
+          height:38px;
+          border-radius:100%;
+          background:#F44336;
+          border:none;
+          outline:none;
+          color:#FFF;
+          font-size:36px;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+          transition:.3s;  
+          -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+        .kc_fab_main_btn:focus {
+          transform:scale(1.1);
+          transform:rotate(45deg);
+          -ms-transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+
+        }
+
+        .web_btns {
+          position: absolute
+        }
     </style>
   </head>
   <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
@@ -37,8 +63,22 @@
       <div class="content">
         <div id="demoOne" class="js-cont-layout">
           <div class="js-cont-layoutA">
+            <ul class="web_btns">
+              <li><button class="kc_fab_main_btn js-zoom-out">-</button></li>
+              <li><button class="kc_fab_main_btn js-zoom-in">+</button></li>
+            </ul>
+            <div class="js-webCont" style="margin: 0;padding: 0;height: 100%;">
+                
+            </div>
+          </div>
+          <div class="js-cont-layoutB">
+            <div class="js-csvListCont">
+              <h2>캡처 목록 <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h2>
+              <ul class="js-csvList">
+                <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
+              </ul>
+            </div>
             <section>
-
               <h2 class="gwt-Label FR">캡처 설정</h2>
               <br/>
               기기 : 
@@ -65,77 +105,23 @@
               File Prefix: <input type="text" name="prefix" autocomplete="on" placeholder="HC" /><br/><br/>
               Zip File Name: <input type="text" name="zipName" autocomplete="on" placeholder="HC_{date}_{seq_id}"/><br/><br/>
               <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
-              
+              <button type="button" id="csvAddBtn" class="btn-basic st"><strong>Add CVS</strong></button>
             </section>
           </div>
-          <div class="js-cont-layoutB">
-              <div class="js-csvListCont">
-                <h3>URL List <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h3>
-                <ul class="js-csvList">
-                  <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
-                </ul>
-              </div>
-              <div class="js-webCont">
-                
-              </div>
-          </div>
         </div>
-<!-- <canvas id="c" style="display:none;" width="300" height="300"></canvas> -->
-  <!-- 
-    <section class="set-option">
-      <ul>
-      <li class="set-mscreen">
-        <input type="checkbox" id="check-mscreen">
-        <label for="check-mscreen">Width mobile screen</label>
-        <input type="text" id="screen-unit" class="inp-basic" value="360"/>
-        <label for="screen-unit">px</label>
-      </li>
-      <li class="set-timer">
-        <input type="checkbox" name="isTimer" id="check-timer">
-        <label for="check-timer">Set Timer</label>
+      </div>
+      
+      <input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
 
-        <div class="input-append date" id="datepicker" style="text-align:right;">
-            <input type="text" class="inp-basic" readonly />
-          <span class="add-on">
-          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-          </span>
-        </div>
-
-        <div class="input-append date" id="timepicker" style="text-align:right;">
-            <input type="text" class="inp-basic" readonly />
-          <span class="add-on">
-          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-          </span>
-        </div>
-      </li>
-      </ul>
-    </section>
-     -->
-    
-    <!-- <section class="lst-files js-csvListCont">
-      <h3>URL List <span class="num">(<strong class="js-listCount"></strong>)</span></h3>
-      <ul class="js-csvList">
-      </ul>
-    </section> -->
-    <!-- 
-    <section class="btn-cvs">
-      <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
-      <button type="button" id="csvDnldBtn" class="btn-basic">CSV 템플릿 다운로드</button>
-    </section>
-     -->
-  </div>
-  <input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
-
-  <section class="content-foot">
-      <button type="submit" class="btn-basic js-submit-btn">일괄 캡처</button>
-    </section>
-  <footer>
-    
-    <div class="logo">HiveCapture by <img src="../img/logo-hivelab.png" alt="hivelab"></div>
-  </footer>
-</div>
-<div class="dimmed" style="display:none"></div>
-<div class="loading-box" style="display:none;"></div>
+      <footer>
+        <section class="content-foot">
+          <button type="submit" class="btn-basic js-submit-btn">일괄 캡처</button>
+        </section>
+        <div class="logo">HiveCapture by <img src="../img/logo-hivelab.png" alt="hivelab"></div>
+      </footer>
+    </div>
+    <div class="dimmed" style="display:none"></div>
+    <div class="loading-box" style="display:none;"></div>
     <!-- 
     * This file is part of the HiveCapture Chrome App.
     *
