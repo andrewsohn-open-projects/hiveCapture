@@ -2,20 +2,20 @@
 const electron = require('electron'),
 fs = require('fs'),
 async = require('async'),
-{app, BrowserWindow, clipboard} = electron.remote,
+{app, BrowserWindow} = electron.remote,
 _ = require('underscore');
 
 var canvas = document.createElement('canvas');
 var ctx = canvas.getContext("2d");
 var segCount;
 
-var captureInfo = JSON.parse(clipboard.readText('captueInfo'));
-let thisWin = BrowserWindow.fromId(captureInfo.winId)
-let bWin;
-let winConfig;
+let thisWin, bWin;
+let winConfig,isDoneProcess = false;
 
 electron.ipcRenderer.on('winConfig', (event, config) => {
     winConfig = config;
+    console.log(config)
+    thisWin = BrowserWindow.fromId(config.captureId)
     
     let captureBrowserSetting = {width: winConfig.size.width, height: winConfig.size.height};
     
@@ -24,7 +24,7 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     bWin = new BrowserWindow(captureBrowserSetting);
     // bWin.openDevTools();
     bWin.on('closed', function () {
-        thisWin.close()
+        threadClose();
     })
 
     let canvasInfo = {
@@ -37,11 +37,7 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
         bWin.webContents.send('canvasInfo', canvasInfo)
     })
     
-})
-
-window.addEventListener('load', ()=> {
-    // document.body.style.overflow = 'hidden';
-    document.body.style.height = 'auto';
+     document.body.style.height = 'auto';
     
     if(document.body.scrollHeight > window.innerHeight){
         async.waterfall([
@@ -85,7 +81,55 @@ window.addEventListener('load', ()=> {
             snapAll();
         }, 500);
     }
-});
+})
+
+// window.addEventListener('load', ()=> {
+//     // document.body.style.overflow = 'hidden';
+//     document.body.style.height = 'auto';
+    
+//     if(document.body.scrollHeight > window.innerHeight){
+//         async.waterfall([
+//             function(cb){
+//                 let res = {};
+
+//                 if(winConfig.isLazyLoad){
+//                     scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 500, function(){
+//                         cb(null, res);
+//                     });
+//                 }else{
+//                     cb(null, res);
+//                 }
+                
+//             },
+//             function(res, cb){
+//                 if(winConfig.isLazyLoad){
+//                     scrollTop(document.body, 500, function(){
+//                         cb(null, res);
+//                     });
+//                 }else{
+//                     cb(null, res);
+//                 }
+                
+//             },
+//             function(res, cb){
+//                 setCanvasWindow(canvas);
+                
+//                 scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight, 1400, function(){
+//                     cb(null, res);
+//                 });
+//             }
+//         ], function(err, result){
+            
+            
+//         });
+
+//     }else{
+//         setTimeout(function() {
+//             setCanvasWindow(canvas);
+//             snapAll();
+//         }, 500);
+//     }
+// });
 
 function scrollBottom(element, destH, frameH, duration, callback) {
     if (duration <= 0 || destH <= 0) return;
@@ -113,20 +157,10 @@ function scrollTop(element, duration, callback) {
     }, duration);
 }
 
-function scrollTo(element, curH, destH, frameH, duration){
+function scrollTo(element, curH, destH, frameH, duration, num){
     setTimeout(function() {
         var isLast = false;
         var leftOverLength;
-
-        curH = curH + frameH;
-        element.scrollTop = curH;
-
-        var num = parseInt(curH/frameH);
-
-        // if(segCount == num){
-        //     leftOverLength = destH - (frameH * segCount);
-        //     isLast = true;
-        // }
 
         snap(num, curH, isLast, leftOverLength, function(image, x, posY){
             let canvasInfo = {
@@ -136,17 +170,23 @@ function scrollTo(element, curH, destH, frameH, duration){
                 "src":image.toDataURL(),
                 "x":x,
                 "posY":posY,
+                "totalH":document.body.scrollHeight,
                 "isLast":isLast
             };
-
+console.log(canvasInfo,curH, destH, (destH-frameH), document.body.scrollHeight)
             bWin.webContents.send('imageInfo', canvasInfo)
             
+            curH = curH + frameH;
+            element.scrollTop = curH;
+            num ++;
+
             if (curH >= (destH-frameH)){
-                scrollSnapBottom(element, num+1, destH, frameH, duration);
+                leftOverLength = destH - curH;
+                scrollSnapBottom(element, num+1, curH, frameH, duration, leftOverLength);
                 return;
             }
 
-            scrollTo(element, curH, destH, frameH, duration);
+            scrollTo(element, curH, destH, frameH, duration, num);
         });
     }, duration);
 }
@@ -161,9 +201,14 @@ function scrollAnim(element, startH, destH, frameH, duration, callback) {
             //time spent
             var oneT = duration / segCount;
 
+            var num = 0;
+
             setTimeout(function() {
-                // var curH = startH + frameH;
-                scrollTo(element, startH, destH, frameH, oneT);
+                
+                var num = parseInt(startH/frameH);
+                console.log(startH, num)
+                
+                scrollTo(element, startH, destH, frameH, oneT, num);
             }, oneT);
 
             cb(null, null);
@@ -176,7 +221,11 @@ function scrollAnim(element, startH, destH, frameH, duration, callback) {
 function snap(num, posY, isLast, leftOverLength, callback){
     let rect = {x:0, y:0, width:Math.round(window.innerWidth-17), height:Math.round(window.innerHeight)};
 
-    if(isLast && leftOverLength !== null) rect.height = leftOverLength;
+    if(isLast && leftOverLength !== null){
+        console.log(leftOverLength)
+        rect.y = window.innerHeight - leftOverLength;
+        rect.height = leftOverLength;
+    } 
 
     thisWin.capturePage(rect,function(image){
         // var y = posY - image.getSize().height;
@@ -202,11 +251,11 @@ function snap(num, posY, isLast, leftOverLength, callback){
     });
 }
 
-function scrollSnapBottom(element, num, destH, frameH, duration){
+function scrollSnapBottom(element, num, posY, frameH, duration, leftOverLength){
     setTimeout(function() {
-        element.scrollTop = destH;
+        element.scrollTop = posY+frameH;
 
-        snap(num, destH, null, null, function(image, x, posY){
+        snap(num, posY, true, leftOverLength, function(image, x, posY){
             let canvasInfo = {
                 "num":num,
                 "width":image.getSize().width,
@@ -218,7 +267,8 @@ function scrollSnapBottom(element, num, destH, frameH, duration){
                 "winId":bWin.id
             };
 
-            bWin.webContents.send('imageInfo', canvasInfo)
+            isDoneProcess = true;
+            bWin.webContents.send('lastImageInfo', canvasInfo)
         });
         
     }, duration);
@@ -255,4 +305,8 @@ function setCanvasWindow(canvas){
 
     bWin.loadURL(template, httpOption)
 
+}
+
+function threadClose(){
+    thisWin.close();
 }

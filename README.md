@@ -14,6 +14,11 @@ Requires
 
 Change Log
 =====
+ * `v 1.0.2`
+ 	 * [improved] main view layout modification
+	 * [new feature] preview zoom in/out feature
+	 * [improved] capturing error developed
+
  * `v 1.0.1`
  	 * [bug fix] CSV URL deletion error fixed
 	 * [improved] no CSV URL validation check

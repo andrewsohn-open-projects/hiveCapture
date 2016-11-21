@@ -2,7 +2,7 @@ const electron = require('electron'),
 fs = require('fs'),
 messages = require('./message.js');
 
-const {app, BrowserWindow, clipboard} = electron.remote
+const {app, BrowserWindow} = electron.remote
 
 ;(function(win, $, ipc){
 	'use strict';
@@ -14,12 +14,10 @@ const {app, BrowserWindow, clipboard} = electron.remote
 		if('undefined' === config.url){
 			// window 닫기 기능 
 		}
-		
-		clipboard.writeText("{\"winId\":"+win.config.captureId+",\"device\":\""+win.config.device+"\"}", 'captueInfo')
 
 		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" style="display:inline-flex; width:100%; height:100%; overflow:hidden;" autosize="on"></webview>');
 		
-		$('body').find('webview').on('dom-ready', () => {
+		$('body').find('webview').on('did-finish-load', () => {
         	// $('body').find('webview')[0].openDevTools();
         	$('body').find('webview')[0].send('winConfig', config)
 		});

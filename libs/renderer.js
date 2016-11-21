@@ -126,9 +126,6 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 		}
 
 		bindEvents(){
-			// console.log(this.$webview[0]);
-			// this.$webview[0].openDevTools();
-
 			this.$contLayout.enhsplitter();
         	this.$contLayoutB.enhsplitter({minSize: 50, vertical: false});
 
