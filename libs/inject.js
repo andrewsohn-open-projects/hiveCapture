@@ -25,7 +25,7 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     
     thisWin = BrowserWindow.fromId(config.captureId)
 
-    let captureBrowserSetting = {width: winConfig.size.width, height: winConfig.size.height};
+    let captureBrowserSetting = {width: winConfig.size.width+17, height: winConfig.size.height};
     
     captureBrowserSetting.show = config.popUpVisible;
     
@@ -85,7 +85,7 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
                 
             },
             function(res, cb){
-                setCanvasWindow(canvas);
+                setCanvasWindow();
                 
                 scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight, 1400, function(){
                     cb(null, res);
@@ -98,7 +98,6 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
 
     }else{
         setTimeout(function() {
-            setCanvasWindow(canvas);
             snapAll();
         }, 500);
     }
@@ -267,12 +266,12 @@ function writeFile(dest, buf){
 
         parentWin.webContents.send('singleCaptureProcess', procConfig)
         
-        bWin.close();
+        if('undefined' !== typeof bWin) bWin.close();
         thisWin.close();
     });
 }
 
-function setCanvasWindow(canvas){
+function setCanvasWindow(){
     let template = "file://"+winConfig.srcPath+"/../templates/canvas.html";
     
     bWin.setMenuBarVisibility(false);

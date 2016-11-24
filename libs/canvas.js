@@ -28,7 +28,7 @@ const {app, BrowserWindow} = electron.remote
 		if ((config.posY + config.height) >= config.totalH) return;
 
 		var myIage = new Image();
-        myIage.width = config.width;
+        myIage.width = config.width+17;
         myIage.height = config.height;
         // console.log(config, innerHeight)
         myIage.src = config.src;

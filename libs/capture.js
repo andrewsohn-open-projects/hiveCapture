@@ -26,7 +26,7 @@ const {app, BrowserWindow} = electron.remote
 
 		thisWin = BrowserWindow.fromId(config.captureId);
 
-		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" style="display:inline-flex; width:100%; height:100%; overflow:hidden;" autosize="on"></webview>');
+		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" style="display:inline-flex; width:'+config.size.width+'px; height:100%; overflow:hidden;" autosize="on"></webview>');
 		
 		$('body').find('webview').on('did-finish-load', () => {
 			threadErrCheck = setTimeout(function(){
@@ -35,7 +35,7 @@ const {app, BrowserWindow} = electron.remote
 		    
 		    if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV")
 		    	$('body').find('webview')[0].openDevTools();
-		    
+
         	$('body').find('webview')[0].send('winConfig', config)
 		});
 	})

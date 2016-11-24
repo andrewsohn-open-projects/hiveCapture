@@ -527,6 +527,8 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
 				this.enableLoading();
+
+				// console.log(config.captureData)
 				this.createFolder(function(){
 
 					_this.powerSaveId = powerSaveBlocker.start('prevent-display-sleep');

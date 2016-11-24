@@ -9,7 +9,8 @@ const config = require('./config');
 const winMenu = require('./layout/win-menu');
 
 // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+const BrowserWindow = electron.BrowserWindow,
+dialog = electron.dialog;
 // const ipcMain = electron.ipcMain
 let mainWindow;
 
@@ -17,6 +18,12 @@ var dirPath = electron.app.getPath('userData') + path.sep + "captures";
 if (!fs.existsSync(dirPath)){
   fs.mkdirSync(dirPath);
 }
+
+// Disable error dialogs by overriding
+// FIX: https://goo.gl/YsDdsS
+dialog.showErrorBox = function(title, content) {
+    console.log(`${title}\n${content}`);
+};
 
 function createWindow () {
   // Create the browser window.
