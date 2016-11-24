@@ -11,12 +11,17 @@ const {app, BrowserWindow} = electron.remote
 	let innerHeight = 0;
 	let canvas = document.getElementById('canvas');
 	let ctx = canvas.getContext("2d");
+	let canvasProcNum = 0;
+	let parentWin;
 
 	canvas.width = Math.round(window.innerWidth-17);
     
 	ipc.on('canvasInfo', (event, config) => {
 		if("undefined" !== typeof config.height) canvas.height = config.height;
 		defaults = config;
+
+		parentWin = BrowserWindow.fromId(config.captureId)
+    	parentWin.webContents.send('canvasProcess', canvasProcNum)
 	})
 
 	ipc.on('imageInfo', (event, config) => {
@@ -25,7 +30,7 @@ const {app, BrowserWindow} = electron.remote
 		var myIage = new Image();
         myIage.width = config.width;
         myIage.height = config.height;
-        console.log(config, innerHeight)
+        // console.log(config, innerHeight)
         myIage.src = config.src;
         myIage.onload = function(){
         	// document.body.appendChild(myIage);
@@ -33,6 +38,9 @@ const {app, BrowserWindow} = electron.remote
         	// var y = config.posY - config.height;
         	ctx.drawImage(myIage, 0, innerHeight);
             innerHeight = innerHeight + config.height;
+
+            canvasProcNum ++;
+            parentWin.webContents.send('canvasProcess', canvasProcNum)
         };
 	})
 
@@ -40,7 +48,7 @@ const {app, BrowserWindow} = electron.remote
 		var myIage = new Image();
         myIage.width = config.width;
         myIage.height = config.height;
-        console.log(config, innerHeight)
+        // console.log(config, innerHeight)
         myIage.src = config.src;
         myIage.onload = function(){
         	ctx.drawImage(myIage, 0, innerHeight);
@@ -56,9 +64,10 @@ const {app, BrowserWindow} = electron.remote
 				let thisWin = BrowserWindow.fromId(config.winId);
 			        
         		fs.writeFile(dest, buf, function(err) {
-			      if(err) console.log(err);
-
-			      thisWin.close()
+					if(err) console.log(err);
+					canvasProcNum ++;
+            		parentWin.webContents.send('canvasProcessEnd', canvasProcNum)
+					thisWin.close()
 			    });
             }
         };

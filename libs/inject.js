@@ -8,21 +8,38 @@ _ = require('underscore');
 var canvas = document.createElement('canvas');
 var ctx = canvas.getContext("2d");
 var segCount;
+var capProcessNum = 1;
 
-let thisWin, bWin;
+let thisWin, bWin, parentWin;
 let winConfig,isDoneProcess = false;
 
+let procConfig = {
+    "captureId":"",
+    "canvasId":"",
+    "num":capProcessNum
+};
+
 electron.ipcRenderer.on('winConfig', (event, config) => {
-    winConfig = config;
     console.log(config)
-    thisWin = BrowserWindow.fromId(config.captureId)
+    winConfig = config;
     
+    thisWin = BrowserWindow.fromId(config.captureId)
+
     let captureBrowserSetting = {width: winConfig.size.width, height: winConfig.size.height};
     
-    captureBrowserSetting.show = false;
+    captureBrowserSetting.show = config.popUpVisible;
     
     bWin = new BrowserWindow(captureBrowserSetting);
-    // bWin.openDevTools();
+
+    procConfig.captureId = config.captureId;
+    procConfig.canvasId = bWin.id;
+
+    parentWin = BrowserWindow.fromId(config.parentId)
+    parentWin.webContents.send('singleCaptureProcess', procConfig)
+
+    if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV") 
+        bWin.openDevTools();
+
     bWin.on('closed', function () {
         threadClose();
     })
@@ -30,14 +47,18 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     let canvasInfo = {
         "height":document.body.scrollHeight,
         "destFolder":winConfig.destFolder,
-        "filename":winConfig.filename
+        "filename":winConfig.filename,
+        "captureId":winConfig.captureId
     }
 
     bWin.webContents.on('did-finish-load', () => {
         bWin.webContents.send('canvasInfo', canvasInfo)
     })
-    
-     document.body.style.height = 'auto';
+
+    // console.log(thisWin.id)
+    thisWin.webContents.send('setCanvasId', thisWin.id)
+
+    document.body.style.height = 'auto';
     
     if(document.body.scrollHeight > window.innerHeight){
         async.waterfall([
@@ -83,54 +104,6 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     }
 })
 
-// window.addEventListener('load', ()=> {
-//     // document.body.style.overflow = 'hidden';
-//     document.body.style.height = 'auto';
-    
-//     if(document.body.scrollHeight > window.innerHeight){
-//         async.waterfall([
-//             function(cb){
-//                 let res = {};
-
-//                 if(winConfig.isLazyLoad){
-//                     scrollBottom(document.body, document.body.scrollHeight, window.innerHeight, 500, function(){
-//                         cb(null, res);
-//                     });
-//                 }else{
-//                     cb(null, res);
-//                 }
-                
-//             },
-//             function(res, cb){
-//                 if(winConfig.isLazyLoad){
-//                     scrollTop(document.body, 500, function(){
-//                         cb(null, res);
-//                     });
-//                 }else{
-//                     cb(null, res);
-//                 }
-                
-//             },
-//             function(res, cb){
-//                 setCanvasWindow(canvas);
-                
-//                 scrollAnim(document.body, 0, document.body.scrollHeight, window.innerHeight, 1400, function(){
-//                     cb(null, res);
-//                 });
-//             }
-//         ], function(err, result){
-            
-            
-//         });
-
-//     }else{
-//         setTimeout(function() {
-//             setCanvasWindow(canvas);
-//             snapAll();
-//         }, 500);
-//     }
-// });
-
 function scrollBottom(element, destH, frameH, duration, callback) {
     if (duration <= 0 || destH <= 0) return;
   
@@ -173,7 +146,9 @@ function scrollTo(element, curH, destH, frameH, duration, num){
                 "totalH":document.body.scrollHeight,
                 "isLast":isLast
             };
-console.log(canvasInfo,curH, destH, (destH-frameH), document.body.scrollHeight)
+            
+            console.log(canvasInfo,curH, destH, (destH-frameH), document.body.scrollHeight)
+
             bWin.webContents.send('imageInfo', canvasInfo)
             
             curH = curH + frameH;
@@ -222,7 +197,6 @@ function snap(num, posY, isLast, leftOverLength, callback){
     let rect = {x:0, y:0, width:Math.round(window.innerWidth-17), height:Math.round(window.innerHeight)};
 
     if(isLast && leftOverLength !== null){
-        console.log(leftOverLength)
         rect.y = window.innerHeight - leftOverLength;
         rect.height = leftOverLength;
     } 
@@ -286,10 +260,15 @@ function snapAll(){
 
 function writeFile(dest, buf){
     fs.writeFile(dest, buf, function(err) {
-      if(err) console.log(err);
+        if(err) console.log(err);
+        
+        capProcessNum = 4;
+        procConfig.num = capProcessNum;
 
-      bWin.close();
-      thisWin.close();
+        parentWin.webContents.send('singleCaptureProcess', procConfig)
+        
+        bWin.close();
+        thisWin.close();
     });
 }
 
@@ -303,7 +282,12 @@ function setCanvasWindow(canvas){
         "userAgent":winConfig.userAgent
     };
 
-    bWin.loadURL(template, httpOption)
+    capProcessNum = 2;
+    procConfig.num = capProcessNum;
+
+    parentWin.webContents.send('singleCaptureProcess', procConfig);
+
+    bWin.loadURL(template, httpOption);
 
 }
 

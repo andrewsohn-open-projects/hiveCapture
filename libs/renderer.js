@@ -33,6 +33,17 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 	var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
 	var commentsTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
 
+	win.hc.CaptureProcess;
+	var closeCanvasResetCapture = function(procConfig){
+		// Close Canvas Window
+		var canvasWin = BrowserWindow.fromId(procConfig.canvasId);
+		if(!canvasWin.isDestroyed()) canvasWin.close();
+
+		// Reload Capture Window
+		var captureWin = BrowserWindow.fromId(procConfig.captureId);
+		if(!captureWin.isDestroyed()) captureWin.reload();
+	};
+
 	/**
 	* 
 	* @class
@@ -41,7 +52,7 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 	win.hc.MainComponent = class MainComponent {
 		defaults(){
 			this.body = $('body');
-			// this.text = '';
+			
 			return {
 				csvUploadBtn: '#csvInsrtBtn',
 				csvAddBtn: '#csvAddBtn',
@@ -78,6 +89,7 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 		init(){
 			this.zoomFactor = 1;
+			this.captureProcess = 0;
 			// console.log(this.options)
 			this.assigneElements();
 			this.bindEvents();
@@ -430,6 +442,9 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 		openCaptureWindow(i){
 			if("undefined" === typeof win.hc.csvUrlData || "undefined" === typeof win.hc.csvUrlData[i]) return;
 
+			if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
+			win.hc.CaptureProcess = null;
+
 			var _this = this;
 			let num = i+1;
 
@@ -437,8 +452,9 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 			let captureBrowserSetting = {width: config.captureData.width+16, height: config.captureData.height};
 
-			captureBrowserSetting.show = false;
+			captureBrowserSetting.show = config.popUpVisible;
 
+			_this.captureProcess = 0;
 			let bWin = new BrowserWindow(captureBrowserSetting)
 			
 			bWin.setMenuBarVisibility(false);
@@ -456,7 +472,9 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				"isLazyLoad":config.captureData.isLazyLoad,
 				"device":config.captureData.deviceType,
 				"srcPath":config.srcPath,
-				"size":captureBrowserSetting
+				"size":captureBrowserSetting,
+				"popUpVisible":config.popUpVisible,
+				"ENVIRONMENT":config.ENVIRONMENT
 			};
 
 			let httpOption = {
@@ -474,10 +492,16 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 			bWin.on('closed', function () {
 				bWin = null;
 				i++;
-				if(i >= win.hc.csvUrlData.length) _this.zipToDest();
+
+				if(i >= win.hc.csvUrlData.length){
+					if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
+
+					win.hc.CaptureProcess = null;
+					_this.zipToDest();
+				}
+
 				_this.openCaptureWindow(i);
 			})
-			
 		}
 
 		onClickSubmitBtn(e){
@@ -506,7 +530,7 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				this.createFolder(function(){
 
 					_this.powerSaveId = powerSaveBlocker.start('prevent-display-sleep');
-
+			
 					_this.openCaptureWindow(0);
 				});
 			}
@@ -733,6 +757,16 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 		        console.log(e.message);
 		      });
 		});
+
+	})
+
+	ipc.on('singleCaptureProcess', (event, procConfig) => {
+		if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
+		win.hc.CaptureProcess = null;
+
+		win.hc.CaptureProcess = setTimeout(function(){
+			closeCanvasResetCapture(procConfig);
+	    },10000);
 
 	})
 

@@ -1,6 +1,7 @@
 const electron = require('electron');
 const app = electron.app;
 const path = require('path');
+const env = "PROD"; // DEV, TEST, PROD
 
 const fileNames = {
   'data':'data.json',
@@ -11,6 +12,8 @@ module.exports = {
   'fileNames' : fileNames,
   'dataPath' : app.getPath('userData') + path.sep + fileNames.data,
   'historyPath' : app.getPath('userData') + path.sep + fileNames.history,
+  'popUpVisible' : false,
+  'ENVIRONMENT' : env,
   'defaultStruct' : {
     'data':{"data":[]},
     'history':{"data":[]}
