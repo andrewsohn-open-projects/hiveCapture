@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>WMC</title>
+    <link rel="stylesheet" type="text/css" href="../css/WMC_member.css">
+    <style type="text/css">
+      html, body{
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin:0;padding:0;
+      }
+  
+    </style>
+    <!-- <script type="text/javascript" src="./WMC_files/jQuery.js.다운로드"></script>
+<script type="text/javascript" src="./WMC_files/jquery.form.js.다운로드"></script>
+<script type="text/javascript" src="./WMC_files/jquery.jsPopup.js.다운로드"></script> 
+<script type="text/javascript" src="./WMC_files/member.js.다운로드"></script>
+<script type="text/javascript" src="./WMC_files/jquery-ui-1.8.6.custom.min.js.다운로드"></script>
+<script type="text/javascript" src="./WMC_files/jquery.blockUI.js.다운로드"></script>
+<script type="text/javascript" src="./WMC_files/mySingleAdm.js.다운로드"></script> -->
+<!-- <script type="text/javascript">
+  function parentLoginAction(){
+    if($('#id').val()=="") {
+      alert('Please enter your ID.');
+      $('#id').focus();
+      return;
+    }
+    if($('#passwd').val()=="") {
+      alert('Please enter your Password.');
+      $('#passwd').focus();
+      return;
+    }
+
+    window.opener.loginAction($('#id').val(), $('#passwd').val());
+    self.close();
+  }
+</script> -->
+  </head>
+  <body>
+    <form id="loginForm" name="loginForm" method="post" autocomplete="off">
+      <div id="SSO0101">
+        <div class="loginArea">
+          <!-- login -->
+          <div class="loginPopupContent">
+            <fieldset>
+              <legend class="hiddenObj">Business Partner</legend>
+              <div class="business">
+                <h2><img src="../img/WMC_h2_business_partner.gif" alt="business partner"></h2>
+                <dl>
+                  <dt><label for="userId">User ID</label></dt>
+                  <dd><input type="text" name="id" id="id" value="hivelab3" class="txtType"></dd>
+       
+                  <dt><label for="password">Password</label></dt>
+                  <dd><input type="password" name="passwd" id="passwd" value="@hive123lab" class="txtType"></dd>
+                </dl>
+                <div class="loginBtn"><a href="#" class="submitBtn"><img src="../img/WMC_btn_login.gif" alt="login"></a></div>
+              </div>
+            </fieldset>
+          </div>
+          <!-- //login -->
+        </div>
+      </div>
+    </form>
+    <!-- 
+    * This file is part of the HiveCapture Chrome App.
+    *
+    * https://github.com/hivelab-open-projects/hiveCapture
+    * 
+    * Copyright 2016, Andrew Sohn
+    * hivelab Co., Ltd
+    * http://www.hivelab.co.kr/
+    * 
+    * Licensed under MIT
+    * 
+    * Released on: October 7, 2016
+    -->
+
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <!-- We are using node <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>. -->
+  </body>
+  <script>
+    // You can also require other files to run in this process
+    window.$ = window.jQuery = require('jquery');
+    require('../libs/ssLogin.js');
+  </script>
+</html>

@@ -1,7 +1,7 @@
 const electron = require('electron');
 const app = electron.app;
 const path = require('path');
-const env = "PROD"; // DEV, TEST, PROD
+const env = "TEST"; // DEV, TEST, PROD
 
 const fileNames = {
   'data':'data.json',
@@ -19,6 +19,51 @@ module.exports = {
     'history':{"data":[]}
   },
   'template' : [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'New',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+N' : 'Ctrl+Shift+N',
+          click (item, focusedWindow) {
+            if (focusedWindow) console.log(item, focusedWindow)
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Import CSV',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+N' : 'Ctrl+Shift+N',
+          click (item, focusedWindow) {
+            if (focusedWindow) console.log(item, focusedWindow)
+          }
+        },
+        {
+          label: 'Export CSV',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+N' : 'Ctrl+Shift+N',
+          click (item, focusedWindow) {
+            if (focusedWindow) console.log(item, focusedWindow)
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'History',
+          type: 'submenu',
+          submenu: [
+
+          ]
+        },
+        {
+          role: 'minimize'
+        },
+        {
+          role: 'close'
+        }
+      ]
+    },
     {
       label: 'Edit',
       submenu: [
@@ -52,25 +97,8 @@ module.exports = {
       ]
     },
     {
-      label: 'View',
+      role: 'window',
       submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click (item, focusedWindow) {
-            if (focusedWindow) focusedWindow.reload()
-          }
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click (item, focusedWindow) {
-            if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-          }
-        },
-        {
-          type: 'separator'
-        },
         {
           role: 'resetzoom'
         },
@@ -89,22 +117,14 @@ module.exports = {
       ]
     },
     {
-      role: 'window',
-      submenu: [
-        {
-          role: 'minimize'
-        },
-        {
-          role: 'close'
-        }
-      ]
-    },
-    {
       role: 'help',
       submenu: [
         {
           label: 'Learn More',
-          click () { require('electron').shell.openExternal('http://electron.atom.io') }
+          click () { require('electron').shell.openExternal('https://github.com/hivelab-open-projects/hiveCapture') }
+        },{
+          label: 'About Us',
+          click () { require('electron').shell.openExternal('http://www.hivelab.co.kr/') }
         }
       ]
     }

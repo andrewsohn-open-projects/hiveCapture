@@ -20,7 +20,7 @@ let procConfig = {
 };
 
 electron.ipcRenderer.on('winConfig', (event, config) => {
-    console.log(config)
+    // console.log(config)
     winConfig = config;
     
     thisWin = BrowserWindow.fromId(config.captureId)
@@ -40,10 +40,6 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV") 
         bWin.openDevTools();
 
-    bWin.on('closed', function () {
-        threadClose();
-    })
-
     let canvasInfo = {
         "height":document.body.scrollHeight,
         "destFolder":winConfig.destFolder,
@@ -52,11 +48,11 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
     }
 
     bWin.webContents.on('did-finish-load', () => {
-        bWin.webContents.send('canvasInfo', canvasInfo)
+        if('undefined' !== typeof bWin) bWin.webContents.send('canvasInfo', canvasInfo)
     })
 
     // console.log(thisWin.id)
-    thisWin.webContents.send('setCanvasId', thisWin.id)
+    if('undefined' !== typeof thisWin) thisWin.webContents.send('setCanvasId', thisWin.id)
 
     document.body.style.height = 'auto';
     
@@ -97,8 +93,30 @@ electron.ipcRenderer.on('winConfig', (event, config) => {
         });
 
     }else{
+
+        setCanvasWindow();
+
         setTimeout(function() {
-            snapAll();
+            var isLast = true;
+
+            snap(0, 0, isLast, null, function(image, x, posY){
+                let canvasInfo = {
+                    "num":0,
+                    "width":image.getSize().width,
+                    "height":image.getSize().height,
+                    "src":image.toDataURL(),
+                    "x":x,
+                    "posY":posY,
+                    "totalH":document.body.scrollHeight,
+                    "isLast":isLast,
+                    "winId":bWin.id
+                };
+                
+                console.log(canvasInfo, document.body.scrollHeight, bWin)
+
+                if('undefined' !== typeof bWin) bWin.webContents.send('lastImageInfo', canvasInfo)
+                
+            });
         }, 500);
     }
 })
@@ -109,9 +127,6 @@ function scrollBottom(element, destH, frameH, duration, callback) {
     setTimeout(function() {
         element.scrollTop = (destH - frameH);
 
-        // if (startH >= (destH-frameH)) return;
-        
-        // scrollTo(element, startH, destH, frameH, duration);
         return callback();
     }, duration);
 }
@@ -122,9 +137,6 @@ function scrollTop(element, duration, callback) {
     setTimeout(function() {
         element.scrollTop = 0;
         
-        // if (startH >= (destH-frameH)) return;
-        
-        // scrollTo(element, startH, destH, frameH, duration);
         return callback();
     }, duration);
 }
@@ -148,7 +160,7 @@ function scrollTo(element, curH, destH, frameH, duration, num){
             
             console.log(canvasInfo,curH, destH, (destH-frameH), document.body.scrollHeight)
 
-            bWin.webContents.send('imageInfo', canvasInfo)
+            if('undefined' !== typeof bWin) bWin.webContents.send('imageInfo', canvasInfo)
             
             curH = curH + frameH;
             element.scrollTop = curH;
@@ -188,12 +200,13 @@ function scrollAnim(element, startH, destH, frameH, duration, callback) {
             cb(null, null);
         }
     ], function(err, result){
-        callback();
+        if('undefined' !== typeof callback) callback();
     });
 }
 
 function snap(num, posY, isLast, leftOverLength, callback){
-    let rect = {x:0, y:0, width:Math.round(window.innerWidth-17), height:Math.round(window.innerHeight)};
+    let inHeight = ('undefined' !== typeof window.innerHeight)? window.innerHeight:document.documentElement.offsetHeight;
+    let rect = {x:0, y:0, width:Math.round(window.innerWidth-17), height:Math.round(inHeight)};
 
     if(isLast && leftOverLength !== null){
         rect.y = window.innerHeight - leftOverLength;
@@ -201,26 +214,7 @@ function snap(num, posY, isLast, leftOverLength, callback){
     } 
 
     thisWin.capturePage(rect,function(image){
-        // var y = posY - image.getSize().height;
         callback(image, 0, posY);
-        // var myIage = new Image();
-        // myIage.width = image.getSize().width;
-        // myIage.height = image.getSize().height;
-        // myIage.src = image.toDataURL();
-        // myIage.onload = function(){
-        //     var y = posY - image.getSize().height;
-        //     ctx.drawImage(myIage, 0, y);
-            
-        // };
-        
-        // if(num > segCount){
-        //     var imgData = canvas.toDataURL();
-        //     var data = imgData.replace(/^data:image\/\w+;base64,/, "");
-        //     var buf = new Buffer(data, 'base64');
-        //     var dest = winConfig.destFolder + "/"+winConfig.filename;
-
-        //     writeFile(dest, buf);
-        // }
     });
 }
 
@@ -241,7 +235,7 @@ function scrollSnapBottom(element, num, posY, frameH, duration, leftOverLength){
             };
 
             isDoneProcess = true;
-            bWin.webContents.send('lastImageInfo', canvasInfo)
+            if('undefined' !== typeof bWin) bWin.webContents.send('lastImageInfo', canvasInfo)
         });
         
     }, duration);
@@ -264,7 +258,7 @@ function writeFile(dest, buf){
         capProcessNum = 4;
         procConfig.num = capProcessNum;
 
-        parentWin.webContents.send('singleCaptureProcess', procConfig)
+        if('undefined' !== typeof parentWin) parentWin.webContents.send('singleCaptureProcess', procConfig)
         
         if('undefined' !== typeof bWin) bWin.close();
         thisWin.close();
@@ -284,12 +278,8 @@ function setCanvasWindow(){
     capProcessNum = 2;
     procConfig.num = capProcessNum;
 
-    parentWin.webContents.send('singleCaptureProcess', procConfig);
+    if('undefined' !== typeof parentWin) parentWin.webContents.send('singleCaptureProcess', procConfig);
 
     bWin.loadURL(template, httpOption);
 
-}
-
-function threadClose(){
-    thisWin.close();
 }

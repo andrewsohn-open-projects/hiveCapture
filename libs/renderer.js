@@ -7,9 +7,10 @@ _ = require('underscore'),
 zipdir = require('zip-dir'),
 rmdir = require('rmdir'),
 messages = require('./message.js'),
+ssConfig = require('./ssConfig.js'),
 devices = require('./devices.js');
 
-const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
+const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron').remote;
 
 ;(function(win, $, ipc){
 	'use strict';
@@ -35,13 +36,29 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 	win.hc.CaptureProcess;
 	var closeCanvasResetCapture = function(procConfig){
+
+		if(win.hc.CaptureProcess) return;
+
 		// Close Canvas Window
 		var canvasWin = BrowserWindow.fromId(procConfig.canvasId);
-		if(!canvasWin.isDestroyed()) canvasWin.close();
+		// if(!canvasWin.isDestroyed() && 'undefined' !== typeof canvasWin) canvasWin.close();
 
 		// Reload Capture Window
 		var captureWin = BrowserWindow.fromId(procConfig.captureId);
-		if(!captureWin.isDestroyed()) captureWin.reload();
+		// if(!captureWin.isDestroyed() && 'undefined' !== typeof captureWin) captureWin.reload();
+
+		// Check all the hidden windows 
+		// if there is any unnecessary windows then close 
+		_.each(BrowserWindow.getAllWindows(), function(bWindow){
+			if(bWindow.id !== config.mainId) {
+				if('undefined' !== typeof captureWin && bWindow.id === captureWin.id && !captureWin.isDestroyed())
+					bWindow.reload();
+				else
+				// if(bWindow.id === canvasWin.id && !canvasWin.isDestroyed() && 'undefined' !== typeof canvasWin)
+					bWindow.close();
+
+			}
+		});
 	};
 
 	/**
@@ -77,6 +94,8 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				urlCount:'.js-listCount',
 				dimmedEle:'.dimmed',
 				loadingEle:'.loading-box',
+				popupCont:'.popup-layer',
+				popupWrap:'.popup_wrap',
 				webBtnsCont:'.web_btns',
 				zoomOut:'.js-zoom-out',
 				zoomIn:'.js-zoom-in'
@@ -90,10 +109,13 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 		init(){
 			this.zoomFactor = 1;
 			this.captureProcess = 0;
-			// console.log(this.options)
 			this.assigneElements();
 			this.bindEvents();
 
+// 			this.checkRedirectPage("http://www.samsung.com/ca/launchingpeople/", function(isRedirect){
+// console.log(isRedirect)
+// 			});
+			
 			// this.appendDimmed();
 			// this.appendModuleClass();
 			// if(this.options.bActivated){
@@ -133,6 +155,10 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 			this.$dimmedEle = this.body.find(this.options.dimmedEle);
 			this.$loadingEle = this.body.find(this.options.loadingEle);
+			this.$popupCont = this.body.find(this.options.popupCont);
+			this.$popupWrap = this.$popupCont.find(this.options.popupWrap);
+			this.$popupCloseBtn = this.$popupCont.find('.close-button');
+			
 			this.$fileEle = this.body.find(this.options.csvEle);
 			this.$submitBtn = this.body.find(this.options.submitBtnClass);
 		}
@@ -155,6 +181,8 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 
 			this.$urlDelAll.on('click', $.proxy(this.onClickDelAll, this));
 			this.$urlList.on('click', $.proxy(this.onClickUrlList, this));
+
+			this.$popupCloseBtn.on('click', $.proxy(this.onClickPopClose, this));
 		}
 
 		onClickZoom(e){
@@ -219,6 +247,25 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
         disableLoading(){
         	this.$dimmedEle.hide();
         	this.$loadingEle.hide();
+        }
+
+        completePopUp(){
+        	this.$popupWrap.find('.msg-text').html("");
+
+        	if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "TEST"){
+        		var timeSpent = $('<p>').text("Time spent - " + this.getTimeforTest());
+        		this.$popupWrap.find('.msg-text').append(timeSpent);
+        	}
+
+			var complete_message = $('<p>').text(messages.complete.message);
+			this.$popupWrap.find('.msg-text').append(complete_message);
+        	this.$popupCont.show();
+        }
+
+        onClickPopClose(e){
+        	e.preventDefault();
+            var popup = $(e.currentTarget).parents(this.options.popupCont);
+            popup.hide();
         }
 
         onFileChange(e, type){
@@ -359,6 +406,10 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
         }
 
 		zipToDest(){
+			_.each(BrowserWindow.getAllWindows(), function(bWindow){
+				if(bWindow.id !== config.mainId) bWindow.close();
+			});
+
 			var nowDate = new Date(),
 			month = nowDate.getMonth()+1,
 			day = nowDate.getDate(),
@@ -396,7 +447,8 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				  if(powerSaveBlocker.isStarted(_this.powerSaveId)) powerSaveBlocker.stop(_this.powerSaveId);				  
 
 				  _this.disableLoading();
-				  alert(messages.complete.message);
+				  _this.completePopUp();
+				  
 				});
 			});
 		}
@@ -439,16 +491,41 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 			return config.captureData.prefix + '_' + order + '_' + domain_name + '.png';
 		}
 
-		openCaptureWindow(i){
-			if("undefined" === typeof win.hc.csvUrlData || "undefined" === typeof win.hc.csvUrlData[i]) return;
+		checkRedirectPage(url, callback){
+			async.waterfall([
+				function(cb){
+					var res = false;
+					var xhr = new XMLHttpRequest();
+					xhr.onload = function(e) {
+						
+						if (this.status < 400 && this.status >= 300) {
+							
+							res = true;
 
-			if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
-			win.hc.CaptureProcess = null;
+						} else if(this.response){
+							// console.log(this.response, 2)
+							var match = this.response.match(/^.*?\bhttp\-equiv\b.*?\brefresh\b.*?$/m);
+							// console.log(match, typeof match)
+					  		res = (match && match.length > 0)? true:false;
+		
+						}
 
-			var _this = this;
+						cb(null, res);
+
+					}
+					xhr.open('GET', url, true);
+					xhr.send();
+					
+				}
+			], function(err, result){
+				callback(result);
+			});
+			
+		}
+
+		procCaptureWindow(i, filename, isRedirect){
+			let _this = this;
 			let num = i+1;
-
-			let filename = this.convertFileName(num, win.hc.csvUrlData[i]);
 
 			let captureBrowserSetting = {width: config.captureData.width+16, height: config.captureData.height};
 
@@ -474,7 +551,8 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				"srcPath":config.srcPath,
 				"size":captureBrowserSetting,
 				"popUpVisible":config.popUpVisible,
-				"ENVIRONMENT":config.ENVIRONMENT
+				"ENVIRONMENT":config.ENVIRONMENT,
+				"isRedirect":isRedirect
 			};
 
 			let httpOption = {
@@ -500,8 +578,169 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 					_this.zipToDest();
 				}
 
+				// Check all the hidden windows 
+				// if there is any unnecessary windows then close 
+				_.each(BrowserWindow.getAllWindows(), function(bWindow){
+					if(bWindow.id !== config.mainId) bWindow.close();
+				});
+
 				_this.openCaptureWindow(i);
 			})
+
+			// let captureBrowserSetting = {width: config.captureData.width+16, height: config.captureData.height};
+
+			// 		captureBrowserSetting.show = config.popUpVisible;
+
+			// 		_this.captureProcess = 0;
+			// 		let bWin = new BrowserWindow(captureBrowserSetting)
+					
+			// 		bWin.setMenuBarVisibility(false);
+			// 		bWin.setAutoHideMenuBar(true);
+
+			// 		let captureData = {
+			// 			"parentId": config.mainId,
+			// 			"captureId": bWin.id,
+			// 			"url":win.hc.csvUrlData[i],
+			// 			"num":num,
+			// 			"destFolder":config.destFolder,
+			// 			"filename":filename,
+			// 			"prefix":config.captureData.prefix,
+			// 			"zipname":"",
+			// 			"isLazyLoad":config.captureData.isLazyLoad,
+			// 			"device":config.captureData.deviceType,
+			// 			"srcPath":config.srcPath,
+			// 			"size":captureBrowserSetting,
+			// 			"popUpVisible":config.popUpVisible,
+			// 			"ENVIRONMENT":config.ENVIRONMENT,
+			// 			"isRedirect":isRedirect
+			// 		};
+
+			// 		let httpOption = {
+			// 			"userAgent":config.captureData.userAgent
+			// 		};
+
+			// 		bWin.loadURL(config.captureData.template, httpOption)
+
+			// 		bWin.webContents.on('did-finish-load', () => {
+			// 			bWin.webContents.send('captureInfo', captureData)
+			// 		})
+
+			// 		console.log(i+1, win.hc.csvUrlData[i])
+
+			// 		bWin.on('closed', function () {
+			// 			bWin = null;
+			// 			i++;
+
+			// 			if(i >= win.hc.csvUrlData.length){
+			// 				if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
+
+			// 				win.hc.CaptureProcess = null;
+			// 				_this.zipToDest();
+			// 			}
+
+			// 			// Check all the hidden windows 
+			// 			// if there is any unnecessary windows then close 
+			// 			_.each(BrowserWindow.getAllWindows(), function(bWindow){
+			// 				if(bWindow.id !== config.mainId) bWindow.close();
+			// 			});
+
+			// 			_this.openCaptureWindow(i);
+			// 		})
+		}
+
+		openCaptureWindow(i){
+			if("undefined" === typeof win.hc.csvUrlData || "undefined" === typeof win.hc.csvUrlData[i]) return;
+
+			if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
+			win.hc.CaptureProcess = null;
+
+			var _this = this;
+			let num = i+1;
+
+			let filename = this.convertFileName(num, win.hc.csvUrlData[i]);
+
+			// Check Samsung.com Preview Page 
+			if(this.isSamsungPreviewPage(win.hc.csvUrlData[i])){
+				// 세션 검사 
+				_this.checkSamsungSession(function(isExist){
+					if(!isExist) _this.openSSLoginWin(function(){
+						// 추후 Redirect Check 기능 추가
+						_this.procCaptureWindow(i, filename, null);
+					});
+					else
+						_this.procCaptureWindow(i, filename, null);
+				});
+
+			}else{
+				// Check Redirect page
+				this.checkRedirectPage(win.hc.csvUrlData[i], function(isRedirect){
+					_this.procCaptureWindow(i, filename, isRedirect);
+				});
+			}
+		}
+
+		openSSLoginWin(callback){
+			let captureBrowserSetting = {width: ssConfig.wdsLogin.width, height: ssConfig.wdsLogin.height};
+			// let captureBrowserSetting = {width: 800, height: 650};
+
+			win.hc.ssLoginWin = new BrowserWindow(captureBrowserSetting)
+
+			win.hc.ssLoginWin.setMenuBarVisibility(false);
+			win.hc.ssLoginWin.setAutoHideMenuBar(true);
+
+			win.hc.ssLoginWin.webContents.openDevTools();
+
+			// win.hc.ssLoginWin.loadURL("https://wds.samsung.com/wds/sso/login/forwardLoginForm.do")
+			if (typeof config.ssloginData === 'undefined') config.ssloginData = {};
+
+			config.ssloginData.template = "file://"+config.srcPath+"/../templates/ssLogin.html";
+
+			win.hc.ssLoginWin.loadURL(config.ssloginData.template)
+
+			win.hc.ssLoginWin.webContents.on('did-finish-load', () => {
+				win.hc.ssLoginWin.webContents.send('captureInfo', {"loginWinId":win.hc.ssLoginWin.id})
+			})
+			
+			win.hc.ssLoginWin.on('closed', function () {
+				callback();
+			})
+
+		}
+
+		isSamsungPreviewPage(url){
+			
+			var match = url.match(/^.*?\b(stgweb4|preview4|STGWEB4|PREVIEW4)\b.*?\bsamsung\.com\b.*?$/m);
+			var res = (match && match.length > 0)? true:false;
+
+			return res;
+		}
+
+		checkSamsungSession(callback){
+			var res = false;
+			// 저장 
+			// const cookie = {url: 'http://wcms4.samsung.com', domain: '.samsung.com', name: 'IW_AUTHENTICATION.P4', value: '52616e646f6d495648920b3fc0e85135ce07694dbe3f38bf673795911a6c81e6aeded00adbe0ca98c4e2a346260089ef15e856b27eec64d965dae31a8e018935050c7bf08f3c4d7e403ea48c477e0eb6902d16941173f0ddb1e8ded04b14f54aee382c85ea7f6db6c5cc4272f51cc437'}
+			
+			// session.defaultSession.cookies.set(cookie, (error) => {
+			//   if (error) console.error(error)
+			// })
+
+			// 삭제
+			// session.defaultSession.cookies.remove(ssConfig.cookie.url, ssConfig.cookie.name, (error) => {
+			//   if (error) console.error(error)
+			// })
+
+			// 검색 all
+			// console.log(ses, ses.cookies.domain)
+			// session.defaultSession.cookies.get({}, (error, cookies) => {
+			//   console.log(error, cookies)
+			// })
+
+			session.defaultSession.cookies.get({domain: ssConfig.cookie.domain, name: ssConfig.cookie.name}, (error, cookie) => {
+				if (error || ("object" === typeof cookie && cookie.length <= 0)) res = false;
+				else res = true;
+
+				callback(res);
+			})	
 		}
 
 		onClickSubmitBtn(e){
@@ -527,8 +766,10 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
 				this.enableLoading();
+				
+				if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "TEST") 
+					_this.setStartTimeForTest();
 
-				// console.log(config.captureData)
 				this.createFolder(function(){
 
 					_this.powerSaveId = powerSaveBlocker.start('prevent-display-sleep');
@@ -676,6 +917,29 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 				
 			}
 		}
+
+		setStartTimeForTest(){
+			this.testStartTime = new Date();
+		}
+
+		getTimeforTest(){
+			var endTime = new Date();
+
+			var sec = ((endTime - this.testStartTime) / 1000 ) % 60;
+			this.testStartTime = null;
+
+			var sec_num = parseInt(sec, 10);
+			console.log(sec_num, sec)
+		    var hours   = Math.floor(sec_num / 3600);
+		    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+		    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+		    if (hours   < 10) {hours   = "0"+hours;}
+		    if (minutes < 10) {minutes = "0"+minutes;}
+		    if (seconds < 10) {seconds = "0"+seconds;}
+		    console.log(hours+':'+minutes+':'+seconds)
+		    return hours+':'+minutes+':'+seconds;
+		}
 	};
 
 	// Data transfered from Main process
@@ -701,7 +965,18 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 							});
 						}
 					}else{
-						res['data'] = JSON.parse(fs.readFileSync(config.dataPath, 'utf8')).data;
+						var dataStrEncoded = fs.readFileSync(config.dataPath, 'utf8');
+						
+						if('undefined' !== typeof dataStrEncoded && dataStrEncoded){
+							try{
+						        res['data'] = JSON.parse(dataStrEncoded).data;
+						    }catch(e){
+						        storage.set(config.fileNames.data, config.defaultStruct.data, function(error) {
+									if (error) throw error;
+								});
+						    }
+						}
+							
 					}
 
 					cb(null, res);
@@ -716,8 +991,19 @@ const {app, BrowserWindow, powerSaveBlocker} = require('electron').remote;
 							});
 						}
 					}else{
-						res['history'] = JSON.parse(fs.readFileSync(config.historyPath, 'utf8'));
+						var historyStrEncoded = fs.readFileSync(config.historyPath, 'utf8');
+
+						if('undefined' !== typeof historyStrEncoded && historyStrEncoded){
+							try{
+						        res['history'] = JSON.parse(historyStrEncoded);
+						    }catch(e){
+						        storage.set(config.fileNames.history, config.defaultStruct.history, function(error) {
+									if (error) throw error;
+								});
+						    }
+						}
 					}
+
 					cb(null, res);
 				});
 			    

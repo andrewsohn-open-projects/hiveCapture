@@ -56,7 +56,7 @@ module.exports = (function() {
       }
     )
     // Window menu.
-    template[3].submenu = [
+    template[0].submenu = [
       {
         label: 'Close',
         accelerator: 'CmdOrCtrl+W',
@@ -79,6 +79,29 @@ module.exports = (function() {
         role: 'front'
       }
     ]
+  }
+
+  if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT !== "PROD"){
+    // Edit menu.
+    template[1].submenu.push(
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click (item, focusedWindow) {
+          if (focusedWindow) focusedWindow.reload()
+        }
+      },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+        click (item, focusedWindow) {
+          if (focusedWindow) focusedWindow.webContents.toggleDevTools()
+        }
+      }
+    )
   }
 
   function init (){

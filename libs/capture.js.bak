@@ -10,7 +10,6 @@ const {app, BrowserWindow} = electron.remote
 	var canvasProcNum = -1;
 	var threadErrCheck;
 	var thisWin, canvasWin;
-	var isFirst = false;
 
 	var closeCanvasResetCapture = function(){
 		if(threadErrCheck) return;
@@ -24,56 +23,28 @@ const {app, BrowserWindow} = electron.remote
 	// Data transfered from Main process
 	ipc.on('captureInfo', (event, config) => {
 		win.config = config
+		// web view element
+		if('undefined' === config.url){
+			// window 닫기 기능 
+		}
 
 		thisWin = BrowserWindow.fromId(config.captureId);
 
-		// web view element
-		if('undefined' === config.url) thisWin.close();
-		
-		// thisWin.webContents.openDevTools();
-
 		$('body').append('<webview id="webView" src="'+config.url+'" preload="../libs/inject.js" style="display:inline-flex; width:'+config.size.width+'px; height:100%; overflow:hidden;" autosize="on"></webview>');
-
-		// According to Redirectable Page Issue
-		if(config.isRedirect){
-			setTimeout(function(){
-				
-				if(isFirst) return;
-				isFirst = true;
-				
-				clearTimeout(threadErrCheck);
-				threadErrCheck = null;
-
-				threadErrCheck = setTimeout(function(){
-					closeCanvasResetCapture();
-			    },5000);
-			    
-			    if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV")
-			    	$('body').find('webview')[0].openDevTools();
-
-	        	$('body').find('webview')[0].send('winConfig', config)
-	        	
-			},3000);
-		}else{
-			$('body').find('webview').on('did-finish-load', (e) => {
-				
-				clearTimeout(threadErrCheck);
-				threadErrCheck = null;
-
-				threadErrCheck = setTimeout(function(){
-					closeCanvasResetCapture();
-			    },5000);
-			    
-			    if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV")
-			    	$('body').find('webview')[0].openDevTools();
-
-	        	$('body').find('webview')[0].send('winConfig', config)
-			});
-		}
 		
-		// $('body').find('webview').on('did-get-redirect-request', (e) => {
-		// })
-		
+		$('body').find('webview').on('did-finish-load', () => {
+			clearTimeout(threadErrCheck);
+			threadErrCheck = null;
+
+			threadErrCheck = setTimeout(function(){
+				closeCanvasResetCapture();
+		    },5000);
+		    
+		    if(config.popUpVisible && 'undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "DEV")
+		    	$('body').find('webview')[0].openDevTools();
+
+        	$('body').find('webview')[0].send('winConfig', config)
+		});
 	})
 
 	ipc.on('canvasProcess', (event, procNum) => {
@@ -84,9 +55,9 @@ const {app, BrowserWindow} = electron.remote
 
 		canvasProcNum = procNum;
 
-		// threadErrCheck = setTimeout(function(){
-		// 	// closeCanvasResetCapture();
-	 //    },5000);
+		threadErrCheck = setTimeout(function(){
+			closeCanvasResetCapture();
+	    },5000);
 
 	})
 
@@ -102,4 +73,8 @@ const {app, BrowserWindow} = electron.remote
 	ipc.on('setCanvasId', (event, canvasId) => {
 	    canvasWin = BrowserWindow.fromId(canvasId);
 	})
+
+	$(function() {
+        
+    });
 })(window, jQuery, electron.ipcRenderer);

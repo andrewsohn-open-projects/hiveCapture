@@ -50,6 +50,41 @@
         .web_btns {
           position: absolute
         }
+
+        .popup-layer {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          box-sizing: border-box;
+          z-index: 999998;
+          overflow: auto;
+          height: 100%;
+        }
+
+        .popup-layer .popup_wrap {
+          position: relative;
+          width: 500px;
+          padding: 30px 30px 0 30px;
+          top: 50%;
+          left: 50%;
+          margin-left: -280px;
+          margin-top: -240.5px;
+          position: absolute;
+          z-index: 999999;
+          background: #fff;
+          overflow: hidden;
+        }
+        .popup-layer .close-button {
+          position: absolute;
+          right: 30px;
+          top: 30px;
+          display: block;
+          width: 22px;
+          height: 22px;
+          background-repeat: no-repeat;
+        }
     </style>
   </head>
   <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
@@ -104,7 +139,7 @@
               
               File Prefix: <input type="text" name="prefix" autocomplete="on" placeholder="HC" /><br/><br/>
               Zip File Name: <input type="text" name="zipName" autocomplete="on" placeholder="HC_{date}_{seq_id}"/><br/><br/>
-              <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Upload CVS</strong></button>
+              <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Import CVS</strong></button>
               <button type="button" id="csvAddBtn" class="btn-basic st"><strong>Add CVS</strong></button>
             </section>
           </div>
@@ -122,6 +157,20 @@
     </div>
     <div class="dimmed" style="display:none"></div>
     <div class="loading-box" style="display:none;"></div>
+    
+    <div class="popup-layer" style="display:none;">
+      <div class="popup_wrap" style="">
+        <h2 class="pop-tit">Capture Complete!</h2>
+        <div class="msg-text">
+        </div>
+        <!-- <p class="msg-text"></p> -->
+        <div class="pop-btn">
+          <!-- <a href="http://www.samsung.com/sg/note7exchange/" class="button" title="Exchange / Refund Notice">Galaxy Note7 Exchange / Refund Programme</a>
+          <a href="http://www.samsung.com/sg/aircraft-restriction-notice/" class="button" title="Galaxy Note 7 Aircraft Restriction Notice">Galaxy Note 7 Aircraft Restriction Notice</a> -->
+        </div>
+        <button class="close-button icon-close-x"><span class="blind">Close</span></button>
+      </div>
+    </div>
     <!-- 
     * This file is part of the HiveCapture Chrome App.
     *
