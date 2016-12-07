@@ -83,6 +83,8 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 				layoutA:'.js-cont-layoutA',
 				layoutB:'.js-cont-layoutB',
 				layoutWebView:'.js-webCont',
+				layoutWebViewUrl:'.js-browser-url',
+				layoutWebViewClose:'button.js-browser-close',
 				csvEle:'input[name=csv]',
 				prefixEle:'input[name=prefix]',
 				zipNameEle:'input[name=zipName]',
@@ -131,7 +133,9 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 			this.$contLayoutA = this.$contLayout.find(this.options.layoutA);
 			// web view container
 			this.$WebViewCont = this.$contLayoutA.find(this.options.layoutWebView);
-
+			this.$WebViewUrlEle = this.$contLayoutA.find(this.options.layoutWebViewUrl);
+			this.$WebViewCloseBtn = this.$contLayoutA.find(this.options.layoutWebViewClose);
+			
 			this.$webBtnsCont = this.$contLayoutA.find(this.options.webBtnsCont);
 			this.$zoomOutBtn = this.$webBtnsCont.find(this.options.zoomOut);
 			this.$zoomInBtn = this.$webBtnsCont.find(this.options.zoomIn);
@@ -164,11 +168,13 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 		}
 
 		bindEvents(){
-			this.$contLayout.enhsplitter();
-        	this.$contLayoutB.enhsplitter({minSize: 50, vertical: false});
+			this.$contLayout.enhsplitter({minSize: 0});
+			// this.$contLayout.find('.splitter_handle').eq(0).on('click.splitter', $.proxy(this.isWebViewVisible, this));
+        	// this.$contLayoutB.enhsplitter({minSize: 50, vertical: false});
 
         	this.$deviceSelEle.on('change', $.proxy(this.onDeviceChange, this));
-
+        	
+        	this.$WebViewCloseBtn.on('click', $.proxy(this.onWebViewClose, this));
         	this.$zoomOutBtn.on('click', $.proxy(this.onClickZoom, this));
 			this.$zoomInBtn.on('click', $.proxy(this.onClickZoom, this));
 
@@ -183,6 +189,14 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 			this.$urlList.on('click', $.proxy(this.onClickUrlList, this));
 
 			this.$popupCloseBtn.on('click', $.proxy(this.onClickPopClose, this));
+		}
+
+		onWebViewClose(e){
+			e.preventDefault();
+			// var target = $(e.currentTarget);
+			
+			this.$contLayout.find('.splitter_handle').eq(0).trigger('click.splitter');
+
 		}
 
 		onClickZoom(e){
@@ -223,6 +237,7 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 			var initUrl = (win.hc.csvUrlData.length > 0 && 'undefined' !== win.hc.csvUrlData[0])? win.hc.csvUrlData[0]:"http://www.hivelab.co.kr/";
 			this.$webview = this.$WebViewCont.find('webview');
 			this.$webview.attr('src',initUrl);
+			this.$WebViewUrlEle.text(initUrl);
 		}
 
 		onClickBtn(e) {
@@ -878,6 +893,7 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 
 				this.$webview = this.$WebViewCont.find('webview');
 				this.$webview[0].loadURL($trg.attr('href'), win.hc.webViewOpt);
+				this.$WebViewUrlEle.text($trg.attr('href'));
 
 			}else if($trg.hasClass(this.options.urlDeleteBtnClass)){
 
@@ -952,11 +968,22 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 
 		async.waterfall([
 			function(cb){
-				
+				let dirPath = app.getPath('userData') + path.sep + "captures";
+
+				try {
+				  fs.accessSync(dirPath);
+				} catch (e) {
+					fs.mkdirSync(dirPath);
+				}
+
 				let res = {
 					"data":{}, "history":{}
 				};
-		
+
+				cb(null, res);
+			},
+			function(res, cb){
+				
 				fs.stat(config.dataPath, function(err, stats){
 					if(err){
 						if(err.code == 'ENOENT' || err.code == 'ENOTDIR'){
@@ -1039,7 +1066,8 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 
 			// first URL displaying webview
 			var initUrl = (newDataArr.length > 0 && 'undefined' !== newDataArr[0])? newDataArr[0]:"http://www.hivelab.co.kr/";
-			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:98%; overflow:hidden;" preload="../libs/mainWebView.js"></webview>');
+			$('.js-webCont').append('<webview id="webView" src="'+initUrl+'" plugins style="display:inline-flex; width:100%; height:100%; overflow:hidden;" preload="../libs/mainWebView.js"></webview>');
+			$('.js-browser-url').text(initUrl);
 
 			document.getElementById('webView').addEventListener('console-message', function(e) {
 		        console.log(e.message);

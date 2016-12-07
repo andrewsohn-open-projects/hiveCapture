@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" electron-titlebar-platform="win32">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../css/hivecapture.css" />
     <link rel="stylesheet" href="../css/jquery.enhsplitter.css" />
     <style>
-
         .splitter_panel > div {
             padding: 0;
         }
@@ -44,11 +43,17 @@
           transform:rotate(45deg);
           -ms-transform: rotate(45deg);
             -webkit-transform: rotate(45deg);
-
         }
 
         .web_btns {
-          position: absolute
+          width: 55px;
+          height: 55px;
+          border-radius: 50%;
+          position: fixed;
+          bottom: 117px;
+          left: 30px;
+          cursor: pointer;
+          z-index: 999;
         }
 
         .popup-layer {
@@ -89,30 +94,41 @@
   </head>
   <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
     <div class="wrap" data-role="page" data-theme="a">
-
-      <header class="ui-header" data-role="header" data-position="inline">
+      <header class="ui-header" data-role="header" data-position="inline" style="height: 80px;">
+      <div id="logo">HIVECAPTURE</div>
+      <div id="electron-titlebar" platform="win32">
+        <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
+      </div>
+      <div id="electron-menubar" platform="win32">
+      <br><br><br>
+      </div>
+      <!-- <div id="electron-titlebar" platform="win32"><div style="width: 100%; height: 100%; position: absolute;">
+        <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
+    </div><div class="button button-close"><img class="button-img-close" src="../css/caption-buttons.svg#close"></div><div class="button button-minimize"><img class="button-img-minimize" src="../css/caption-buttons.svg#minimize"></div><div class="button button-maximize"><img class="button-img-maximize" src="../css/caption-buttons.svg#maximize"><img class="button-img-restore" src="../css/caption-buttons.svg#restore" style="display: none;"></div></div> -->
         <!-- <h1>Hive Capture <span class="server-status"><em></em></span></h1>
         <p class="version js-app-version"></p> -->
       </header>
 
       <div class="content">
         <div id="demoOne" class="js-cont-layout">
-          <div class="js-cont-layoutA">
-            <ul class="web_btns">
-              <li><button class="kc_fab_main_btn js-zoom-out">-</button></li>
-              <li><button class="kc_fab_main_btn js-zoom-in">+</button></li>
-            </ul>
-            <div class="js-webCont" style="margin: 0;padding: 0;height: 100%;">
-                
-            </div>
-          </div>
-          <div class="js-cont-layoutB">
-            <div class="js-csvListCont">
-              <h2>캡처 목록 <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h2>
-              <ul class="js-csvList">
-                <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
+          <div class="js-cont-layoutA" style="overflow: hidden;">
+            <div class="head-layoutA" style="width: 100%;height: 8%;">
+              <button class="kc_fab_main_btn">></button>
+              <span class="js-browser-url"></span>
+              <button class="kc_fab_main_btn js-browser-close" style="position:absolute;right: 0;">X</button>
+
+              <ul class="web_btns" style="position:absolute;right: 0;">
+                <li><button class="kc_fab_main_btn js-zoom-out">-</button></li>
+                <li><button class="kc_fab_main_btn js-zoom-in">+</button></li>
               </ul>
             </div>
+            
+            <div class="js-webCont" style="margin: 0;padding: 0;height: 92%;">
+                
+            </div>
+            
+          </div>
+          <div class="js-cont-layoutB">
             <section>
               <h2 class="gwt-Label FR">캡처 설정</h2>
               <br/>
@@ -142,6 +158,12 @@
               <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Import CVS</strong></button>
               <button type="button" id="csvAddBtn" class="btn-basic st"><strong>Add CVS</strong></button>
             </section>
+            <div class="js-csvListCont" style="height: 50%">
+              <h2>캡처 목록 <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h2>
+              <ul class="js-csvList">
+                <!-- <a class="gwt-Anchor DR ER" href="#">Limits</a> -->
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -195,5 +217,6 @@
     window.$ = window.jQuery = require('jquery');
     require('../libs/vender/jquery.enhsplitter');
     require('../libs/renderer.js');
+    require('../libs/menu-eventlistener.js');
   </script>
 </html>

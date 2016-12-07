@@ -14,11 +14,14 @@ Requires
 
 Change Log
 =====
+ * `v 1.1.1`
+ 	 * [new feature] new frameless title bar
+	 * [improved] main UI improved
+	 
  * `v 1.1.0`
  	 * [new feature] Samsung.com P4 User Login Access
 	 * [improved] blackout capturing error fixed
 	 
-
  * `v 1.0.3`
  	 * [improved] installation EXE with creation Desktop shortcut icon
 	 * [improved] infinite capture error fixed

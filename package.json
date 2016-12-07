@@ -1,6 +1,6 @@
 {
   "name": "hivecapture",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "productName": "HiveCapture",
   "description": "HiveCapture :: CSV File Screen Capture App",
   "main": "libs/app.js",
@@ -27,7 +27,7 @@
     "zip-dir": "^1.0.2"
   },
   "build": {
-    "app-bundle-id": "org.test.mytest",
+    "appId": "com.hivelab.hcapture",
     "app-category-type": "public.app-category.graphics-design",
     "osx": {
       "contents": [
@@ -46,7 +46,7 @@
     },
     "win": {
       "title": "HiveCapture Tool",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "iconUrl": "http://uxd.hivelab.co.kr/users/sohn/hivecapture_256x256.ico",
       "icon": "img/icons/hivecapture_256x256.ico",
       "msi": false,

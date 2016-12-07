@@ -14,11 +14,6 @@ dialog = electron.dialog;
 // const ipcMain = electron.ipcMain
 let mainWindow;
 
-var dirPath = electron.app.getPath('userData') + path.sep + "captures";
-if (!fs.existsSync(dirPath)){
-  fs.mkdirSync(dirPath);
-}
-
 // Disable error dialogs by overriding
 // FIX: https://goo.gl/YsDdsS
 dialog.showErrorBox = function(title, content) {
@@ -30,12 +25,15 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1200
     , height: 750
-    // , frame: false
+    , frame: false
   })
   
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/../templates/index.html`)
-
+  const menu = electron.Menu.buildFromTemplate(config.template);
+  // electron.Menu.setApplicationMenu(menu);
+  mainWindow.setMenu(menu);
+  
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
