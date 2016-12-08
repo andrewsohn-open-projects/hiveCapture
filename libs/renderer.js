@@ -10,6 +10,8 @@ messages = require('./message.js'),
 ssConfig = require('./ssConfig.js'),
 devices = require('./devices.js');
 
+require('./layout/win-menu');
+
 const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron').remote;
 
 ;(function(win, $, ipc){
@@ -189,6 +191,16 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 			this.$urlList.on('click', $.proxy(this.onClickUrlList, this));
 
 			this.$popupCloseBtn.on('click', $.proxy(this.onClickPopClose, this));
+
+			$(document).on('keyup', $.proxy(this.onKeyUp, this));
+		}
+
+		onKeyUp (e) {
+			if (e.keyCode == 27) {
+				if(this.$loadingEle.is(':visible')){
+					this.forceStopProc(messages.forceStop.message);
+				}
+			}
 		}
 
 		onWebViewClose(e){
@@ -266,8 +278,9 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 
         completePopUp(){
         	this.$popupWrap.find('.msg-text').html("");
+        	this.$popupWrap.find('.pop-tit').text(messages.complete.title);
 
-        	if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "TEST"){
+        	if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT !== "PROD"){
         		var timeSpent = $('<p>').text("Time spent - " + this.getTimeforTest());
         		this.$popupWrap.find('.msg-text').append(timeSpent);
         	}
@@ -277,10 +290,22 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
         	this.$popupCont.show();
         }
 
+        forceStopPopUp(message){
+        	this.$popupWrap.find('.msg-text').html("");
+        	this.$popupWrap.find('.pop-tit').text(messages.forceStop.title);
+        	
+        	var complete_message = $('<p>').text(message);
+			this.$popupWrap.find('.msg-text').append(complete_message);
+        	this.$popupCont.show();
+        }
+
         onClickPopClose(e){
         	e.preventDefault();
             var popup = $(e.currentTarget).parents(this.options.popupCont);
             popup.hide();
+
+            var mainWin = BrowserWindow.fromId(config.mainId);
+            mainWin.reload();
         }
 
         onFileChange(e, type){
@@ -420,6 +445,26 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
         	
         }
 
+        forceStopProc(message){
+        	var _this = this;
+
+        	_.each(BrowserWindow.getAllWindows(), function(bWindow){
+				if(bWindow.id !== config.mainId) {
+					bWindow.close();
+				}
+			});
+
+			rmdir(config.destFolder, function (err, dirs, files) {
+				console.log('all files are removed');
+
+				if(powerSaveBlocker.isStarted(_this.powerSaveId)) powerSaveBlocker.stop(_this.powerSaveId);				  
+
+				_this.disableLoading();
+				_this.forceStopPopUp(message);
+			  
+			});
+        }
+
 		zipToDest(){
 			_.each(BrowserWindow.getAllWindows(), function(bWindow){
 				if(bWindow.id !== config.mainId) bWindow.close();
@@ -445,9 +490,8 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 			try {
 			  fs.accessSync(config.destFolder);
 			} catch (e) {
-			  	return res.json({ 
-					error: e.error
-				});
+				_this.forceStopProc(e.error);
+				return;
 			}
 
 			var zipFilePath = app.getPath('desktop') + path.sep + config.zipFileName;
@@ -601,66 +645,6 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 
 				_this.openCaptureWindow(i);
 			})
-
-			// let captureBrowserSetting = {width: config.captureData.width+16, height: config.captureData.height};
-
-			// 		captureBrowserSetting.show = config.popUpVisible;
-
-			// 		_this.captureProcess = 0;
-			// 		let bWin = new BrowserWindow(captureBrowserSetting)
-					
-			// 		bWin.setMenuBarVisibility(false);
-			// 		bWin.setAutoHideMenuBar(true);
-
-			// 		let captureData = {
-			// 			"parentId": config.mainId,
-			// 			"captureId": bWin.id,
-			// 			"url":win.hc.csvUrlData[i],
-			// 			"num":num,
-			// 			"destFolder":config.destFolder,
-			// 			"filename":filename,
-			// 			"prefix":config.captureData.prefix,
-			// 			"zipname":"",
-			// 			"isLazyLoad":config.captureData.isLazyLoad,
-			// 			"device":config.captureData.deviceType,
-			// 			"srcPath":config.srcPath,
-			// 			"size":captureBrowserSetting,
-			// 			"popUpVisible":config.popUpVisible,
-			// 			"ENVIRONMENT":config.ENVIRONMENT,
-			// 			"isRedirect":isRedirect
-			// 		};
-
-			// 		let httpOption = {
-			// 			"userAgent":config.captureData.userAgent
-			// 		};
-
-			// 		bWin.loadURL(config.captureData.template, httpOption)
-
-			// 		bWin.webContents.on('did-finish-load', () => {
-			// 			bWin.webContents.send('captureInfo', captureData)
-			// 		})
-
-			// 		console.log(i+1, win.hc.csvUrlData[i])
-
-			// 		bWin.on('closed', function () {
-			// 			bWin = null;
-			// 			i++;
-
-			// 			if(i >= win.hc.csvUrlData.length){
-			// 				if(win.hc.CaptureProcess) clearTimeout(win.hc.CaptureProcess);
-
-			// 				win.hc.CaptureProcess = null;
-			// 				_this.zipToDest();
-			// 			}
-
-			// 			// Check all the hidden windows 
-			// 			// if there is any unnecessary windows then close 
-			// 			_.each(BrowserWindow.getAllWindows(), function(bWindow){
-			// 				if(bWindow.id !== config.mainId) bWindow.close();
-			// 			});
-
-			// 			_this.openCaptureWindow(i);
-			// 		})
 		}
 
 		openCaptureWindow(i){
@@ -766,7 +750,7 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 				return;
 			}
 
-			if(confirm(messages.proceed.message)){
+			if(confirm(win.hc.csvUrlData.length + messages.proceed.message)){
 				var _this = this;
 
 				config.captureData = {};
@@ -782,7 +766,7 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 				config.captureData.template = "file://"+config.srcPath+"/../templates/capture.html";
 				this.enableLoading();
 				
-				if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT === "TEST") 
+				if('undefined' !== typeof config.ENVIRONMENT && config.ENVIRONMENT !== "PROC") 
 					_this.setStartTimeForTest();
 
 				this.createFolder(function(){
@@ -935,11 +919,13 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 		}
 
 		setStartTimeForTest(){
-			this.testStartTime = new Date();
+			this.testStartTime = new Date().getTime();
+			console.log(this.testStartTime)
 		}
 
 		getTimeforTest(){
-			var endTime = new Date();
+			var endTime = new Date().getTime();
+			console.log(endTime)
 
 			var sec = ((endTime - this.testStartTime) / 1000 ) % 60;
 			this.testStartTime = null;
@@ -961,6 +947,9 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 	// Data transfered from Main process
 	ipc.on('info', (event, config) => {
 		win.config = config;
+
+		//Main Menu Bar Setting
+		new win.hc.MenuTemplate(config);
 		
 		var $ul_list = $('.js-csvList'),
 		$urlCount = $('.js-listCount'),

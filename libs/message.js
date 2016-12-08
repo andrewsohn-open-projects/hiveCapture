@@ -15,10 +15,15 @@ module.exports = {
         }
     },
     "proceed": {
-        "message":"진행하시겠습니까?"
+        "message":"개 URL 캡쳐를 진행하시겠습니까?"
     },
     "complete": {
+        "title":"Capture Complete!",
         "message":"일괄 캡처를 완료하였습니다."
+    },
+    "forceStop": {
+        "title":"Capture Stoped!",
+        "message":"일괄 캡처를 취소하였습니다."
     },
     "emptyFile": {
         "message":"죄송합니다. 유효한 URL을 찾을 수가 없습니다.\n다시 첨부하여 주십시요."

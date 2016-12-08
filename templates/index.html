@@ -6,6 +6,7 @@
     <title>HiveCapture</title>
     <link rel="stylesheet" href="../css/hivecapture.css" />
     <link rel="stylesheet" href="../css/jquery.enhsplitter.css" />
+    <link rel="stylesheet" href="../css/hc.menu.css" />
     <style>
         .splitter_panel > div {
             padding: 0;
@@ -99,9 +100,7 @@
       <div id="electron-titlebar" platform="win32">
         <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
       </div>
-      <div id="electron-menubar" platform="win32">
-      <br><br><br>
-      </div>
+      
       <!-- <div id="electron-titlebar" platform="win32"><div style="width: 100%; height: 100%; position: absolute;">
         <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
     </div><div class="button button-close"><img class="button-img-close" src="../css/caption-buttons.svg#close"></div><div class="button button-minimize"><img class="button-img-minimize" src="../css/caption-buttons.svg#minimize"></div><div class="button button-maximize"><img class="button-img-maximize" src="../css/caption-buttons.svg#maximize"><img class="button-img-restore" src="../css/caption-buttons.svg#restore" style="display: none;"></div></div> -->
@@ -110,6 +109,122 @@
       </header>
 
       <div class="content">
+        <div id="electron-menubar" platform="win32">
+        <div id="menu-bar">
+            <ul class="main-menu">
+                <li>
+                    File
+                    <ul>
+                        <li>
+                            New
+                            <ul>
+                                <li><a href="http://www.google.com/" target="_blank">Google search (opens in new tab)</a></li>
+                                <li class="separator"></li>
+                                <li><a href="/#!/new-document">Product</a></li>
+                                <li><a href="/#!/new-document">Document</a></li>
+                                <li><a href="/#!/new-client">Client</a></li>
+                            </ul>
+                        </li>
+                        <li class="separator"></li>
+                        <li class="icon save"><a href="javascript:void(0)">Save<span>Ctrl+S</span></a></li>
+                        <li class="separator"></li>
+                        <li class="disabled"><a href="/#!/import">Import</a></li>
+                        <li>Export</li>
+                        <li class="separator"></li>
+                        <li class="icon print"><a href="javascript:void(0)">Print<span>Ctrl+P</span></a></li>
+                        <li class="separator"></li>
+                        <li>Logout</li>
+                    </ul>
+                </li>
+                <li>
+                    View
+                    <ul>
+                        <li>Documents
+                            <ul>
+                                <li>All</li>
+                                <li class="separator"></li>
+                                <li>Unfinished</li>
+                                <li>Closed</li>
+                            </ul>
+                        </li>
+                        <li><a href="/#!/products">Products</a></li>
+                        <li class="separator"></li>
+            <li>
+              First level
+              <ul>
+                <li>
+                  Second level
+                  <ul>
+                    <li>
+                      Third level menu item
+                    </li>
+                    <li>
+                    Third level
+                    <ul>
+                        <li>
+                          Forth level menu item 1
+                        </li>
+                        <li>
+                          Forth level menu item 2
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="separator"></li>
+                    <li>Another third level menu item</li>
+                  </ul>
+                </li>
+                <li>
+                  Items will make menus stretch as needed
+                </li>
+                <li class="separator"></li>
+                <li>
+                   Another menu item
+                </li>
+              </ul>
+            </li>
+            <li class="separator"></li>
+                        <li>Reports
+                            <ul>
+                                <li>Sell history</li>
+                                <li>Clients history</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Settings
+                    <ul>
+            <li>
+              Style configurator
+            </li>
+                        <li class="separator"></li>
+                        <li>
+                            Account
+                            <ul>
+                                <li>Company data</li>
+                                <li>Personal data</li>                            
+                            </ul>
+                        </li>
+                        <li class="separator"></li>
+                        <li>
+                            Options
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Help
+                    <ul>
+                        <li>Index</li>
+                        <li class="separator"></li>
+                        <li>Upgrade account</li>
+                        <li>Registration</li>
+                        <li class="separator"></li>
+                        <li>Contact us</li>
+                    </ul>
+                </li>
+            </ul><!-- end mainmenu -->        
+        </div>
+      </div>
         <div id="demoOne" class="js-cont-layout">
           <div class="js-cont-layoutA" style="overflow: hidden;">
             <div class="head-layoutA" style="width: 100%;height: 8%;">
@@ -182,7 +297,7 @@
     
     <div class="popup-layer" style="display:none;">
       <div class="popup_wrap" style="">
-        <h2 class="pop-tit">Capture Complete!</h2>
+        <h2 class="pop-tit"></h2>
         <div class="msg-text">
         </div>
         <!-- <p class="msg-text"></p> -->

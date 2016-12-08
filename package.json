@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "productName": "HiveCapture",
   "description": "HiveCapture :: CSV File Screen Capture App",
-  "main": "libs/app.js",
+  "main": "bin/app.js",
   "scripts": {
     "start": "electron .",
     "publish": "electron-packager . hivecapture --out=dist/apps --platform=win32 --arch=x64 app-version=1.0 --icon=img/icons/hivecapture_256x256.ico --overwrite",
@@ -29,7 +29,7 @@
   "build": {
     "appId": "com.hivelab.hcapture",
     "app-category-type": "public.app-category.graphics-design",
-    "osx": {
+    "mac": {
       "contents": [
         {
           "x": 410,

@@ -1,7 +1,7 @@
 const electron = require('electron');
 const app = electron.app;
 const path = require('path');
-const env = "DEV"; // DEV, TEST, PROD
+const env = "PROD"; // DEV, TEST, PROD
 
 const fileNames = {
   'data':'data.json',

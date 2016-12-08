@@ -17,6 +17,8 @@ Change Log
  * `v 1.1.1`
  	 * [new feature] new frameless title bar
 	 * [improved] main UI improved
+	 * [bug fix] no such a directory error alert during the installation fixed
+	 * [bug fix] TEST version spent time error fixed
 	 
  * `v 1.1.0`
  	 * [new feature] Samsung.com P4 User Login Access

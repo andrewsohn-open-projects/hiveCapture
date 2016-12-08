@@ -4,9 +4,9 @@ async = require('async'),
 path = require('path'),
 _ = require('underscore');
 
-const config = require('./config');
+const config = require('./config/config');
 
-const winMenu = require('./layout/win-menu');
+const winMenu = require('./setting');
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow,
