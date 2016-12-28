@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" electron-titlebar-platform="win32">
+<html lang="ko">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
-    <title>HiveCapture</title>
+    <title>HIVE CAPTURE</title>
     <link rel="stylesheet" href="../css/hivecapture.css" />
     <link rel="stylesheet" href="../css/jquery.enhsplitter.css" />
     <link rel="stylesheet" href="../css/hc.menu.css" />
@@ -95,136 +95,9 @@
   </head>
   <body class="ui-mobile-viewport ui-overlay-a" id="ui-page-top">
     <div class="wrap" data-role="page" data-theme="a">
-      <header class="ui-header" data-role="header" data-position="inline" style="height: 80px;">
-      <div id="logo">HIVECAPTURE</div>
-      <div id="electron-titlebar" platform="win32">
-        <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
-      </div>
-      
-      <!-- <div id="electron-titlebar" platform="win32"><div style="width: 100%; height: 100%; position: absolute;">
-        <div class="drag" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; "></div>
-    </div><div class="button button-close"><img class="button-img-close" src="../css/caption-buttons.svg#close"></div><div class="button button-minimize"><img class="button-img-minimize" src="../css/caption-buttons.svg#minimize"></div><div class="button button-maximize"><img class="button-img-maximize" src="../css/caption-buttons.svg#maximize"><img class="button-img-restore" src="../css/caption-buttons.svg#restore" style="display: none;"></div></div> -->
-        <!-- <h1>Hive Capture <span class="server-status"><em></em></span></h1>
-        <p class="version js-app-version"></p> -->
-      </header>
+      <header class="ui-header" data-role="header"></header>
 
       <div class="content">
-        <div id="electron-menubar" platform="win32">
-        <div id="menu-bar">
-            <ul class="main-menu">
-                <li>
-                    File
-                    <ul>
-                        <li>
-                            New
-                            <ul>
-                                <li><a href="http://www.google.com/" target="_blank">Google search (opens in new tab)</a></li>
-                                <li class="separator"></li>
-                                <li><a href="/#!/new-document">Product</a></li>
-                                <li><a href="/#!/new-document">Document</a></li>
-                                <li><a href="/#!/new-client">Client</a></li>
-                            </ul>
-                        </li>
-                        <li class="separator"></li>
-                        <li class="icon save"><a href="javascript:void(0)">Save<span>Ctrl+S</span></a></li>
-                        <li class="separator"></li>
-                        <li class="disabled"><a href="/#!/import">Import</a></li>
-                        <li>Export</li>
-                        <li class="separator"></li>
-                        <li class="icon print"><a href="javascript:void(0)">Print<span>Ctrl+P</span></a></li>
-                        <li class="separator"></li>
-                        <li>Logout</li>
-                    </ul>
-                </li>
-                <li>
-                    View
-                    <ul>
-                        <li>Documents
-                            <ul>
-                                <li>All</li>
-                                <li class="separator"></li>
-                                <li>Unfinished</li>
-                                <li>Closed</li>
-                            </ul>
-                        </li>
-                        <li><a href="/#!/products">Products</a></li>
-                        <li class="separator"></li>
-            <li>
-              First level
-              <ul>
-                <li>
-                  Second level
-                  <ul>
-                    <li>
-                      Third level menu item
-                    </li>
-                    <li>
-                    Third level
-                    <ul>
-                        <li>
-                          Forth level menu item 1
-                        </li>
-                        <li>
-                          Forth level menu item 2
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="separator"></li>
-                    <li>Another third level menu item</li>
-                  </ul>
-                </li>
-                <li>
-                  Items will make menus stretch as needed
-                </li>
-                <li class="separator"></li>
-                <li>
-                   Another menu item
-                </li>
-              </ul>
-            </li>
-            <li class="separator"></li>
-                        <li>Reports
-                            <ul>
-                                <li>Sell history</li>
-                                <li>Clients history</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    Settings
-                    <ul>
-            <li>
-              Style configurator
-            </li>
-                        <li class="separator"></li>
-                        <li>
-                            Account
-                            <ul>
-                                <li>Company data</li>
-                                <li>Personal data</li>                            
-                            </ul>
-                        </li>
-                        <li class="separator"></li>
-                        <li>
-                            Options
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    Help
-                    <ul>
-                        <li>Index</li>
-                        <li class="separator"></li>
-                        <li>Upgrade account</li>
-                        <li>Registration</li>
-                        <li class="separator"></li>
-                        <li>Contact us</li>
-                    </ul>
-                </li>
-            </ul><!-- end mainmenu -->        
-        </div>
-      </div>
         <div id="demoOne" class="js-cont-layout">
           <div class="js-cont-layoutA" style="overflow: hidden;">
             <div class="head-layoutA" style="width: 100%;height: 8%;">
@@ -245,33 +118,44 @@
           </div>
           <div class="js-cont-layoutB">
             <section>
-              <h2 class="gwt-Label FR">캡처 설정</h2>
+              <button class="kc_fab_main_btn js-version-noti">+</button>
+              <h2 class="gwt-Label FR">HIVE CAPTURE</h2>
+              <!-- <button class="kc_fab_main_btn js-csv-download">+</button> -->
+              <a href="http://uxd.hivelab.co.kr/hivecapture/samples/HC_URL_List_Template.csv">download</a>
               <br/>
-              기기 : 
-              <select name="device">
-                <option value="pc-win">PC - Windows</option>
-                <option value="pc-mac">PC - MAC</option>
-                <option value="m-galaxyS6">M - 갤럭시S6</option>
-                <option value="m-galaxyS5">M - 갤럭시S5</option>
-                <option value="m-galaxyS4">M - 갤럭시S4</option>
-                <option value="m-galaxyS3">M - 갤럭시S3</option>
-                <option value="m-iphone6">M - 아이폰6</option>
-                <option value="m-iphone6p">M - 아이폰6 플러스</option>
-                <option value="t-ipad">T - 아이패드</option>
-                <option value="t-galaxyTab">T - 갤럭시 탭</option>
+              DEVICE : 
+              <select name="device1">
+                <option value="pc">PC</option>
+                <option value="m">Mobile</option>
+                <option value="t">Tablet</option>
+                <option value="othr">그 외</option>
+              </select>
+              <select name="device2">
+                <option value="pc-win">Windows</option>
+                <option value="pc-mac">MAC</option>
+                <option value="m-galaxyS6">갤럭시S6</option>
+                <option value="m-galaxyS5">갤럭시S5</option>
+                <option value="m-galaxyS4">갤럭시S4</option>
+                <option value="m-galaxyS3">갤럭시S3</option>
+                <option value="m-iphone6">아이폰6</option>
+                <option value="m-iphone6p">아이폰6 플러스</option>
+                <option value="t-ipad">아이패드</option>
+                <option value="t-galaxyTab">갤럭시 탭</option>
                 <option value="othr">그 외</option>
               </select>
               <br/><br/>
-              해상도 : <input type="text" name="dimenW" placeholder="1280"/> x <input type="text" name="dimenH" placeholder="768"/><input type="checkbox" id="op_noVert" name="noVert"><label for="op_noVert">세로값 무시</label><br/><br/>
-              옵션: 
+              RESOLUTION : <input type="text" name="dimenW" placeholder="1280"/> x <input type="text" name="dimenH" placeholder="768"/><input type="checkbox" id="op_noVert" name="noVert"><label for="op_noVert">해당영역</label><br/><br/>
+              OPTIONS : 
               <input type="checkbox" id="op_lazy" name="isLazyLoad" checked><label for="op_lazy">레이지 로딩</label>  
-              <input type="checkbox" id="test" name="chk2"><label for="test">테스트</label>  
+              <input type="checkbox" id="test" name="chk2"><label for="test">스티키메뉴 고정</label>  
               <input type="checkbox" id="test2" name="chk2"><label for="test2">테스트2</label><br/><br/>
               
-              File Prefix: <input type="text" name="prefix" autocomplete="on" placeholder="HC" /><br/><br/>
-              Zip File Name: <input type="text" name="zipName" autocomplete="on" placeholder="HC_{date}_{seq_id}"/><br/><br/>
-              <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>Import CVS</strong></button>
-              <button type="button" id="csvAddBtn" class="btn-basic st"><strong>Add CVS</strong></button>
+              FILE PREFIX : <input type="text" name="prefix" autocomplete="on" placeholder="HC" /><input type="checkbox" id="showUrl" name="showUrl"><label for="showUrl">URL노출</label><br/><br/>
+              ZIP FILE NAME : <input type="text" name="zipName" autocomplete="on" placeholder="HC_{date}_{seq_id}"/><br/><br/>
+              <button type="button" id="csvInsrtBtn" class="btn-basic st"><strong>CVS파일 신규등록</strong></button>
+              <button type="button" id="csvAddBtn" class="btn-basic st"><strong>CVS파일 추가등록</strong></button>
+              
+              <button type="submit" class="btn-basic js-submit-btn">일괄 캡처</button>
             </section>
             <div class="js-csvListCont" style="height: 50%">
               <h2>캡처 목록 <span class="num">(<strong class="js-listCount"></strong>)</span><button type="button" class="btn-circle btn-del js-btn-delAll">Delete all</button></h2>
@@ -286,9 +170,6 @@
       <input name="csv" class="_csvFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display: none;" />
 
       <footer>
-        <section class="content-foot">
-          <button type="submit" class="btn-basic js-submit-btn">일괄 캡처</button>
-        </section>
         <div class="logo">HiveCapture by <img src="../img/logo-hivelab.png" alt="hivelab"></div>
       </footer>
     </div>
@@ -332,6 +213,5 @@
     window.$ = window.jQuery = require('jquery');
     require('../libs/vender/jquery.enhsplitter');
     require('../libs/renderer.js');
-    require('../libs/menu-eventlistener.js');
   </script>
 </html>

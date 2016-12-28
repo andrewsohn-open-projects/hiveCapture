@@ -5,7 +5,6 @@ path = require('path'),
 _ = require('underscore');
 
 const config = require('./config/config');
-
 const winMenu = require('./setting');
 
 // Module to create native browser window.
@@ -14,8 +13,6 @@ dialog = electron.dialog;
 // const ipcMain = electron.ipcMain
 let mainWindow;
 
-// Disable error dialogs by overriding
-// FIX: https://goo.gl/YsDdsS
 dialog.showErrorBox = function(title, content) {
     console.log(`${title}\n${content}`);
 };
@@ -25,13 +22,14 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1200
     , height: 750
-    , frame: false
+    // frameless
+    // , frame: false
   })
   
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/../templates/index.html`)
   const menu = electron.Menu.buildFromTemplate(config.template);
-  // electron.Menu.setApplicationMenu(menu);
+  electron.Menu.setApplicationMenu(menu);
   mainWindow.setMenu(menu);
   
   // Open the DevTools.
@@ -78,6 +76,3 @@ electron.app.on('activate', function () {
     createWindow()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

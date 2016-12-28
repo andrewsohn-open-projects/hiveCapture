@@ -10,8 +10,6 @@ messages = require('./message.js'),
 ssConfig = require('./ssConfig.js'),
 devices = require('./devices.js');
 
-require('./layout/win-menu');
-
 const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron').remote;
 
 ;(function(win, $, ipc){
@@ -948,9 +946,6 @@ const {app, BrowserWindow, powerSaveBlocker, net, session} = require('electron')
 	ipc.on('info', (event, config) => {
 		win.config = config;
 
-		//Main Menu Bar Setting
-		new win.hc.MenuTemplate(config);
-		
 		var $ul_list = $('.js-csvList'),
 		$urlCount = $('.js-listCount'),
 		$submitBtn = $('button.js-submit-btn');
